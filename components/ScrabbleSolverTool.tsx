@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { findAnagrams, sortResults, calculateScore } from '@/lib/anagramSolver';
-import { getDictionary } from '@/lib/dictionary';
+import { getDictionaryAsync } from '@/lib/dictionary';
 
 export default function ScrabbleSolverTool() {
   const [tiles, setTiles] = useState('');
@@ -11,18 +11,19 @@ export default function ScrabbleSolverTool() {
   const [minLength, setMinLength] = useState(3);
   const [results, setResults] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [dictionaryType, setDictionaryType] = useState<'common' | 'full'>('full');
 
-  const handleSolve = () => {
+  const handleSolve = async () => {
     // Allow searching by prefix/suffix even if no tiles are provided
     if (!tiles.trim() && !prefix && !suffix) return;
 
     setLoading(true);
-    setTimeout(() => {
-      const dictionary = getDictionary('scrabble');
-      // If tiles are provided, use anagram search; otherwise start from full dictionary
-      let anagrams = tiles.trim()
-        ? findAnagrams(tiles.toLowerCase(), dictionary)
-        : Array.from(dictionary);
+    // Load selected dictionary asynchronously ('full' uses words_alpha)
+    const dictionary = await getDictionaryAsync(dictionaryType);
+    // If tiles are provided, use anagram search; otherwise start from full dictionary
+    let anagrams = tiles.trim()
+      ? findAnagrams(tiles.toLowerCase(), dictionary)
+      : Array.from(dictionary);
 
       // Filter by prefix and suffix if provided
       if (prefix) {
@@ -37,14 +38,13 @@ export default function ScrabbleSolverTool() {
         );
       }
 
-      // Filter by minimum length
-      anagrams = anagrams.filter((word) => word.length >= minLength);
+    // Filter by minimum length
+    anagrams = anagrams.filter((word) => word.length >= minLength);
 
-      // Sort by Scrabble score (highest first)
-      const sorted = sortResults(anagrams, 'score');
-      setResults(sorted);
-      setLoading(false);
-    }, 100);
+    // Sort by Scrabble score (highest first)
+    const sorted = sortResults(anagrams, 'score');
+    setResults(sorted);
+    setLoading(false);
   };
 
   return (
@@ -72,7 +72,24 @@ export default function ScrabbleSolverTool() {
           </div>
 
           {/* Advanced filters */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <div>
+              <label
+                htmlFor="dictionaryType"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Dictionary
+              </label>
+              <select
+                id="dictionaryType"
+                value={dictionaryType}
+                onChange={(e) => setDictionaryType(e.target.value as 'common' | 'full')}
+                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              >
+                <option value="full">Full (comprehensive)</option>
+                <option value="common">Common (faster)</option>
+              </select>
+            </div>
             <div>
               <label
                 htmlFor="prefix"
