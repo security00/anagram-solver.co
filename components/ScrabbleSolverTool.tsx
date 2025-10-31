@@ -13,12 +13,16 @@ export default function ScrabbleSolverTool() {
   const [loading, setLoading] = useState(false);
 
   const handleSolve = () => {
-    if (!tiles.trim()) return;
+    // Allow searching by prefix/suffix even if no tiles are provided
+    if (!tiles.trim() && !prefix && !suffix) return;
 
     setLoading(true);
     setTimeout(() => {
       const dictionary = getDictionary('scrabble');
-      let anagrams = findAnagrams(tiles.toLowerCase(), dictionary);
+      // If tiles are provided, use anagram search; otherwise start from full dictionary
+      let anagrams = tiles.trim()
+        ? findAnagrams(tiles.toLowerCase(), dictionary)
+        : Array.from(dictionary);
 
       // Filter by prefix and suffix if provided
       if (prefix) {
@@ -130,7 +134,7 @@ export default function ScrabbleSolverTool() {
 
           <button
             onClick={handleSolve}
-            disabled={!tiles.trim() || loading}
+            disabled={(tiles.trim().length === 0 && !prefix && !suffix) || loading}
             className="w-full rounded-md bg-green-600 px-4 py-3 text-lg font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Finding Words...' : 'Find Scrabble Words'}
