@@ -9,7 +9,7 @@ export const revalidate = false;
 
 export const metadata: Metadata = {
   title: 'Scrabble Solver - Find High-Scoring Scrabble Words',
-  description: 'Advanced Scrabble solver to find the highest-scoring words from your tiles. Optimize your Scrabble game with our powerful tool.',
+  description: 'Use our Scrabble solver to find high-scoring words from your rack instantly. Filter by length, prefixes, and suffixes to maximize points every turn.',
   keywords: ['scrabble solver', 'scrabble word finder', 'scrabble helper', 'scrabble cheater'],
   alternates: {
     canonical: 'https://anagram-solver.co/tools/scrabble-solver',

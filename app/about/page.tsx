@@ -8,7 +8,7 @@ export const revalidate = false;
 
 export const metadata: Metadata = {
   title: 'About Anagram Solver - Free Online Word Tool',
-  description: "Learn about our anagram solver tool, how it works, and why it's the best free online resource for word games.",
+  description: "Learn how our anagram solver works, the tech behind it, and why it's a fast, accurate, and free resource for word games and puzzle fans.",
   keywords: ['about anagram solver', 'word game tools', 'online word utilities'],
   metadataBase: new URL('https://anagram-solver.co'),
   alternates: {

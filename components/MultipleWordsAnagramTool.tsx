@@ -9,14 +9,21 @@ export default function MultipleWordsAnagramTool() {
   const [maxWords, setMaxWords] = useState(2);
   const [results, setResults] = useState<string[][]>([]);
   const [loading, setLoading] = useState(false);
-  const [dictionaryType, setDictionaryType] = useState<'common' | 'full'>('full');
+  // Default to 'common' for faster multi-word search
+  const [dictionaryType, setDictionaryType] = useState<'common' | 'full'>('common');
 
   const handleSolve = async () => {
     if (!input.trim()) return;
 
     setLoading(true);
     const dictionary = await getDictionaryAsync(dictionaryType);
-    const multiWordAnagrams = findMultiWordAnagrams(input.toLowerCase(), dictionary, maxWords);
+    // Use optimized multi-word solver with a reasonable results cap
+    const multiWordAnagrams = findMultiWordAnagrams(
+      input.toLowerCase(),
+      dictionary,
+      maxWords,
+      { maxResults: 200, minWordLength: 2 }
+    );
 
     // Sort by total score (sum of all words in the combination)
     const sortedResults = multiWordAnagrams.sort((a, b) => {

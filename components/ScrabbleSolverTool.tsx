@@ -12,29 +12,37 @@ export default function ScrabbleSolverTool() {
   const [results, setResults] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [dictionaryType, setDictionaryType] = useState<'common' | 'full'>('full');
+  // Track whether user has attempted a search so we can show an empty state
+  const [searched, setSearched] = useState(false);
 
   const handleSolve = async () => {
+    // Normalize inputs for consistent behavior
+    const tilesTrim = tiles.trim();
+    const prefixTrim = prefix.trim();
+    const suffixTrim = suffix.trim();
+
     // Allow searching by prefix/suffix even if no tiles are provided
-    if (!tiles.trim() && !prefix && !suffix) return;
+    if (!tilesTrim && !prefixTrim && !suffixTrim) return;
 
     setLoading(true);
+    setSearched(true);
     // Load selected dictionary asynchronously ('full' uses words_alpha)
     const dictionary = await getDictionaryAsync(dictionaryType);
     // If tiles are provided, use anagram search; otherwise start from full dictionary
-    let anagrams = tiles.trim()
-      ? findAnagrams(tiles.toLowerCase(), dictionary)
+    let anagrams = tilesTrim
+      ? findAnagrams(tilesTrim.toLowerCase(), dictionary)
       : Array.from(dictionary);
 
       // Filter by prefix and suffix if provided
-      if (prefix) {
+      if (prefixTrim) {
         anagrams = anagrams.filter((word) =>
-          word.toLowerCase().startsWith(prefix.toLowerCase())
+          word.toLowerCase().startsWith(prefixTrim.toLowerCase())
         );
       }
 
-      if (suffix) {
+      if (suffixTrim) {
         anagrams = anagrams.filter((word) =>
-          word.toLowerCase().endsWith(suffix.toLowerCase())
+          word.toLowerCase().endsWith(suffixTrim.toLowerCase())
         );
       }
 
@@ -102,6 +110,7 @@ export default function ScrabbleSolverTool() {
                 id="prefix"
                 value={prefix}
                 onChange={(e) => setPrefix(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSolve()}
                 placeholder="e.g., UN"
                 className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 maxLength={5}
@@ -120,6 +129,7 @@ export default function ScrabbleSolverTool() {
                 id="suffix"
                 value={suffix}
                 onChange={(e) => setSuffix(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSolve()}
                 placeholder="e.g., ING"
                 className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 maxLength={5}
@@ -151,32 +161,40 @@ export default function ScrabbleSolverTool() {
 
           <button
             onClick={handleSolve}
-            disabled={(tiles.trim().length === 0 && !prefix && !suffix) || loading}
+            // Disable only when all inputs are empty or while loading
+            disabled={(tiles.trim().length === 0 && prefix.trim().length === 0 && suffix.trim().length === 0) || loading}
             className="w-full rounded-md bg-green-600 px-4 py-3 text-lg font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Finding Words...' : 'Find Scrabble Words'}
           </button>
 
-          {results.length > 0 && (
+          {/* Results / Empty state */}
+          {searched && (
             <div className="mt-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Found {results.length} Scrabble word{results.length !== 1 ? 's' : ''} (sorted by score):
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
-                {results.map((word, index) => (
-                  <div
-                    key={index}
-                    className="rounded-md bg-green-50 px-4 py-3 text-center border border-green-200 dark:bg-gray-700 dark:border-gray-600"
-                  >
-                    <span className="font-bold text-green-900 dark:text-white text-lg">
-                      {word.toUpperCase()}
-                    </span>
-                    <div className="text-sm text-green-700 dark:text-gray-300 mt-1">
-                      {word.length} letters • {calculateScore(word)} points
+              {results.length === 0 ? (
+                <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-gray-700 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
+                  No words found. Try different tiles, adjust prefix/suffix, or lower the minimum length.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
+                  {results.map((word, index) => (
+                    <div
+                      key={index}
+                      className="rounded-md bg-green-50 px-4 py-3 text-center border border-green-200 dark:bg-gray-700 dark:border-gray-600"
+                    >
+                      <span className="font-bold text-green-900 dark:text-white text-lg">
+                        {word.toUpperCase()}
+                      </span>
+                      <div className="text-sm text-green-700 dark:text-gray-300 mt-1">
+                        {word.length} letters • {calculateScore(word)} points
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

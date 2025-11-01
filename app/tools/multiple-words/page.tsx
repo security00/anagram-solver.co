@@ -9,21 +9,21 @@ export const revalidate = false;
 
 export const metadata: Metadata = {
   title: 'Multiple Word Anagram Solver - Find Word Combinations',
-  description: 'Find multi-word anagrams and word combinations. Discover all possible phrase anagrams from your letters.',
+  description: 'Find multi-word anagrams and word combinations from your letters. Discover valid phrase anagrams quickly with smart filters to explore creative results.',
   keywords: ['multiple word anagram', 'phrase anagram', 'anagram combinations', 'multi word solver'],
   alternates: {
     canonical: 'https://anagram-solver.co/tools/multiple-words',
   },
   openGraph: {
     title: 'Multiple Word Anagram Solver - Find Word Combinations',
-    description: 'Find multi-word anagrams and word combinations. Discover all possible phrase anagrams from your letters.',
+    description: 'Find multi-word anagrams and word combinations from your letters. Discover valid phrase anagrams quickly with smart filters to explore creative results.',
     url: 'https://anagram-solver.co/tools/multiple-words',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Multiple Word Anagram Solver - Find Word Combinations',
-    description: 'Find multi-word anagrams and word combinations. Discover all possible phrase anagrams from your letters.',
+    description: 'Find multi-word anagrams and word combinations from your letters. Discover valid phrase anagrams quickly with smart filters to explore creative results.',
   },
 };
 

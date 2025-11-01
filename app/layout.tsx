@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Free Anagram Solver - Generate Word Anagrams Online',
-  description: 'Solve anagrams instantly with our free online tool. Find all possible words from your letters, perfect for Scrabble and word games.',
+  description: 'Use our fast anagram solver to instantly find valid words from any letters. Perfect for Scrabble, crosswords, and word games with accurate scoring.',
   keywords: ['anagram', 'anagram solver', 'word anagram', 'free anagram tool', 'anagram generator'],
   metadataBase: new URL('https://anagram-solver.co'),
   openGraph: {

@@ -96,56 +96,91 @@ export function findWithWildcards(
 export function findMultiWordAnagrams(
   input: string,
   dictionary: Set<string>,
-  maxWords: number = 3
+  maxWords: number = 3,
+  options?: { maxResults?: number; minWordLength?: number }
 ): string[][] {
-  const inputFreq = getCharFrequency(input);
-  const results: string[][] = [];
+  // Faster implementation: prefilter candidates, use arrays for counts, memoize states, stop after a cap
+  const maxResults = options?.maxResults ?? 200;
+  const minLen = options?.minWordLength ?? 2;
 
-  function backtrack(
-    remaining: Map<string, number>,
-    currentWords: string[],
-    depth: number
-  ) {
-    if (depth === 0) {
-      // Check if all letters are used
-      let allUsed = true;
-      for (const count of remaining.values()) {
-        if (count > 0) {
-          allUsed = false;
-          break;
-        }
-      }
-      if (allUsed && currentWords.length > 0) {
-        results.push([...currentWords]);
-      }
+  const letters = input.toLowerCase().replace(/\s+/g, '');
+  const n = letters.length;
+  if (n === 0) return [];
+
+  // Map 'a'..'z' to 0..25
+  const toIdx = (c: string) => c.charCodeAt(0) - 97;
+  const makeCounts = (s: string): number[] => {
+    const arr = new Array(26).fill(0);
+    for (let i = 0; i < s.length; i++) {
+      const code = s.charCodeAt(i);
+      if (code >= 97 && code <= 122) arr[code - 97]++;
+    }
+    return arr;
+  };
+  const canSubtract = (left: number[], take: number[]): boolean => {
+    for (let i = 0; i < 26; i++) if (take[i] > left[i]) return false;
+    return true;
+  };
+  const subtractInPlace = (left: number[], take: number[]): void => {
+    for (let i = 0; i < 26; i++) left[i] -= take[i];
+  };
+  const addInPlace = (left: number[], add: number[]): void => {
+    for (let i = 0; i < 26; i++) left[i] += add[i];
+  };
+  const remainingLen = (cnt: number[]): number => cnt.reduce((s, v) => s + v, 0);
+  const keyOf = (cnt: number[]): string => cnt.join(',');
+
+  const inputCnt = makeCounts(letters);
+
+  // Prefilter dictionary to only words buildable from input and >= minLen and <= total length
+  const candidates: { word: string; cnt: number[]; len: number }[] = [];
+  for (const w of dictionary) {
+    const word = w.toLowerCase();
+    if (word.length < minLen || word.length > n) continue;
+    // quick skip non a-z
+    if (!/^[a-z]+$/.test(word)) continue;
+    const cnt = makeCounts(word);
+    if (canSubtract(inputCnt, cnt)) candidates.push({ word, cnt, len: word.length });
+  }
+
+  // Sort longer words first to reduce branching and finish sooner
+  candidates.sort((a, b) => b.len - a.len || (a.word < b.word ? -1 : 1));
+
+  const results: string[][] = [];
+  const memo = new Set<string>();
+
+  function dfs(startIdx: number, rem: number[], chosen: string[]) {
+    if (results.length >= maxResults) return; // stop early
+
+    const remLen = remainingLen(rem);
+    if (remLen === 0) {
+      if (chosen.length > 0) results.push([...chosen]);
       return;
     }
+    if (chosen.length === maxWords) return;
 
-    for (const word of dictionary) {
-      const wordFreq = getCharFrequency(word);
-      let canUse = true;
+    const memoKey = chosen.length + '|' + keyOf(rem) + '|' + startIdx;
+    if (memo.has(memoKey)) return;
+    memo.add(memoKey);
 
-      for (const [char, count] of wordFreq) {
-        if ((remaining.get(char) || 0) < count) {
-          canUse = false;
-          break;
-        }
-      }
+    for (let i = startIdx; i < candidates.length; i++) {
+      const c = candidates[i];
+      // simple pruning: if word longer than remaining, skip
+      if (c.len > remLen) continue;
+      if (!canSubtract(rem, c.cnt)) continue;
 
-      if (canUse) {
-        const newRemaining = new Map(remaining);
-        for (const [char, count] of wordFreq) {
-          newRemaining.set(char, (newRemaining.get(char) || 0) - count);
-        }
+      subtractInPlace(rem, c.cnt);
+      chosen.push(c.word);
+      // allow reuse of words by starting from i (not i+1); to avoid permutations, keep non-decreasing index
+      dfs(i, rem, chosen);
+      chosen.pop();
+      addInPlace(rem, c.cnt);
 
-        currentWords.push(word);
-        backtrack(newRemaining, currentWords, depth - 1);
-        currentWords.pop();
-      }
+      if (results.length >= maxResults) return;
     }
   }
 
-  backtrack(new Map(inputFreq), [], maxWords);
+  dfs(0, inputCnt.slice(), []);
   return results;
 }
 

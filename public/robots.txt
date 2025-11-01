@@ -2,25 +2,25 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /private/
-Disallow: /_next/
 Disallow: /api/
+Disallow: /_next/
 
+# Preferred host and sitemap
 Sitemap: https://anagram-solver.co/sitemap.xml
 
-# Google-specific rules
+# Major bots
 User-agent: Googlebot
 Allow: /
 
-# Bing-specific rules
 User-agent: Bingbot
 Allow: /
 
-# Block bad bots
+# Block known aggressive crawlers
 User-agent: MJ12bot
 Disallow: /
 
 User-agent: AhrefsBot
 Disallow: /
 
-# Crawl delay
+# Politeness
 Crawl-delay: 1

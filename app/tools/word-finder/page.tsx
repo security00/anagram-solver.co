@@ -9,21 +9,21 @@ export const revalidate = false;
 
 export const metadata: Metadata = {
   title: 'Word Finder Tool - Create Words From Letters Online',
-  description: 'Powerful word finder tool to create words from any letters. Perfect for puzzles, games, and word challenges.',
+  description: 'Create words from letters with our powerful word finder. Instantly generate valid words, filter by length and patterns, and boost scores in puzzles and games.',
   keywords: ['word finder', 'word maker', 'create words', 'letter combination'],
   alternates: {
     canonical: 'https://anagram-solver.co/tools/word-finder',
   },
   openGraph: {
     title: 'Word Finder Tool - Create Words From Letters Online',
-    description: 'Powerful word finder tool to create words from any letters. Perfect for puzzles, games, and word challenges.',
+    description: 'Create words from letters with our powerful word finder. Instantly generate valid words, filter by length and patterns, and boost scores in puzzles and games.',
     url: 'https://anagram-solver.co/tools/word-finder',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Word Finder Tool - Create Words From Letters Online',
-    description: 'Powerful word finder tool to create words from any letters. Perfect for puzzles, games, and word challenges.',
+    description: 'Create words from letters with our powerful word finder. Instantly generate valid words, filter by length and patterns, and boost scores in puzzles and games.',
   },
 };
 
