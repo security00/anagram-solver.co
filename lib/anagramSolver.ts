@@ -97,18 +97,17 @@ export function findMultiWordAnagrams(
   input: string,
   dictionary: Set<string>,
   maxWords: number = 3,
-  options?: { maxResults?: number; minWordLength?: number }
+  options?: { maxResults?: number; minWordLength?: number; exactWordCount?: number }
 ): string[][] {
   // Faster implementation: prefilter candidates, use arrays for counts, memoize states, stop after a cap
   const maxResults = options?.maxResults ?? 200;
   const minLen = options?.minWordLength ?? 2;
 
-  const letters = input.toLowerCase().replace(/\s+/g, '');
+  const letters = input.toLowerCase().replace(/[^a-z]/g, '');
   const n = letters.length;
   if (n === 0) return [];
 
   // Map 'a'..'z' to 0..25
-  const toIdx = (c: string) => c.charCodeAt(0) - 97;
   const makeCounts = (s: string): number[] => {
     const arr = new Array(26).fill(0);
     for (let i = 0; i < s.length; i++) {
@@ -154,7 +153,9 @@ export function findMultiWordAnagrams(
 
     const remLen = remainingLen(rem);
     if (remLen === 0) {
-      if (chosen.length > 0) results.push([...chosen]);
+      if (chosen.length > 0 && (!options?.exactWordCount || chosen.length === options.exactWordCount)) {
+        results.push([...chosen]);
+      }
       return;
     }
     if (chosen.length === maxWords) return;

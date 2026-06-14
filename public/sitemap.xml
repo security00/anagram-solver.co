@@ -21,6 +21,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://anagram-solver.co/tools/two-word-anagram-solver</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://anagram-solver.co/tools/three-word-anagram-solver</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://anagram-solver.co/blog/anagram-tips</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

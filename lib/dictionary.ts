@@ -3,7 +3,7 @@
  * Loads and manages word dictionaries for anagram solving
  */
 
-let dictionaryCache: Map<string, Set<string>> = new Map();
+const dictionaryCache: Map<string, Set<string>> = new Map();
 
 // Common English words dictionary (comprehensive list)
 const COMMON_WORDS = [
@@ -358,7 +358,7 @@ export async function getDictionaryAsync(type: string): Promise<Set<string>> {
       const { loadWordsAlpha } = await import('./wordLoader');
       const words = await loadWordsAlpha();
       return words;
-    } catch (e) {
+    } catch {
       // Fallback to common set if loading fails (client/offline)
       return getDictionary('common');
     }

@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { findAnagrams, sortResults, calculateScore } from '@/lib/anagramSolver';
 import { getDictionaryAsync } from '@/lib/dictionary';
 
+type SortBy = 'length' | 'alphabetical' | 'score';
+
 export default function AnagramSolverTool() {
   const [input, setInput] = useState('');
   const [results, setResults] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [sortBy, setSortBy] = useState<'length' | 'alphabetical' | 'score'>('length');
+  const [sortBy, setSortBy] = useState<SortBy>('length');
   const [dictionaryType, setDictionaryType] = useState<'common' | 'full'>('full');
 
   const handleSolve = async () => {
@@ -64,7 +66,7 @@ export default function AnagramSolverTool() {
             </label>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as SortBy)}
               className="rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               <option value="length">Length</option>

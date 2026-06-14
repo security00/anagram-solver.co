@@ -9,6 +9,8 @@ export default function Footer() {
       { name: 'Scrabble Solver', href: '/tools/scrabble-solver' },
       { name: 'Word Finder', href: '/tools/word-finder' },
       { name: 'Multiple Word Anagrams', href: '/tools/multiple-words' },
+      { name: 'Two Word Anagram Solver', href: '/tools/two-word-anagram-solver' },
+      { name: 'Three Word Anagram Solver', href: '/tools/three-word-anagram-solver' },
     ],
     company: [
       { name: 'About Us', href: '/about' },

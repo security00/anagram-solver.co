@@ -44,6 +44,18 @@ export const seoConfig = {
     keywords: ['multiple word anagram', 'phrase anagram', 'anagram combinations', 'multi word solver'],
     canonical: `${BASE_URL}/tools/multiple-words`,
   },
+  twoWordAnagram: {
+    title: 'Two Word Anagram Solver - Find Exact 2 Word Anagrams',
+    description: 'Find exact two-word anagrams from letters, names, and phrases. Use every letter once and filter results quickly.',
+    keywords: ['two word anagram solver', '2 word anagram solver', 'anagram solver 2 words'],
+    canonical: `${BASE_URL}/tools/two-word-anagram-solver`,
+  },
+  threeWordAnagram: {
+    title: 'Three Word Anagram Solver - Find Exact 3 Word Anagrams',
+    description: 'Find exact three-word anagrams from longer phrases. Use every letter once and filter results quickly.',
+    keywords: ['three word anagram solver', '3 word anagram solver', 'anagram solver 3 words'],
+    canonical: `${BASE_URL}/tools/three-word-anagram-solver`,
+  },
   about: {
     title: 'About Anagram Solver - Free Online Word Tool',
     description: 'Learn about our anagram solver tool, how it works, and why it\'s the best free online resource for word games.',
@@ -93,7 +105,20 @@ export function verifySEOCompliance(content: string, keywordDensity: string[]): 
 }
 
 // Generate structured data for JSON-LD
-export function generateJSONLD(type: 'WebPage' | 'FAQPage' | 'Article', data: any) {
+type FAQItem = {
+  question: string;
+  answer: string;
+};
+
+type JSONLDData = {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  datePublished?: string;
+  faqs?: FAQItem[];
+};
+
+export function generateJSONLD(type: 'WebPage' | 'FAQPage' | 'Article', data: JSONLDData) {
   const baseLD = {
     '@context': 'https://schema.org',
     '@type': type,
@@ -116,7 +141,7 @@ export function generateJSONLD(type: 'WebPage' | 'FAQPage' | 'Article', data: an
     case 'FAQPage':
       return {
         ...baseLD,
-        mainEntity: data.faqs.map((faq: any) => ({
+        mainEntity: (data.faqs || []).map((faq) => ({
           '@type': 'Question',
           name: faq.question,
           acceptedAnswer: {
@@ -228,6 +253,8 @@ export const sitemapPages = [
   { path: '/tools/scrabble-solver', priority: 0.9, changefreq: 'weekly' },
   { path: '/tools/word-finder', priority: 0.9, changefreq: 'weekly' },
   { path: '/tools/multiple-words', priority: 0.8, changefreq: 'weekly' },
+  { path: '/tools/two-word-anagram-solver', priority: 0.8, changefreq: 'weekly' },
+  { path: '/tools/three-word-anagram-solver', priority: 0.8, changefreq: 'weekly' },
   { path: '/about', priority: 0.7, changefreq: 'monthly' },
   { path: '/faq', priority: 0.8, changefreq: 'monthly' },
   { path: '/blog/anagram-tips', priority: 0.6, changefreq: 'monthly' },

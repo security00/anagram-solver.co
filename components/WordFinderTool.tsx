@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { findAnagrams, findWithWildcards, sortResults, calculateScore } from '@/lib/anagramSolver';
 import { getDictionaryAsync } from '@/lib/dictionary';
 
+type SortBy = 'length' | 'alphabetical' | 'score';
+
 export default function WordFinderTool() {
   const [letters, setLetters] = useState('');
   const [pattern, setPattern] = useState('');
   const [minLength, setMinLength] = useState(3);
   const [maxLength, setMaxLength] = useState(15);
-  const [sortBy, setSortBy] = useState<'length' | 'alphabetical' | 'score'>('length');
+  const [sortBy, setSortBy] = useState<SortBy>('length');
   const [results, setResults] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [dictionaryType, setDictionaryType] = useState<'common' | 'full'>('full');
@@ -166,7 +168,7 @@ export default function WordFinderTool() {
               <select
                 id="sortBy"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as SortBy)}
                 className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
                 <option value="length">Length</option>

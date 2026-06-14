@@ -1,135 +1,209 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MultipleWordsAnagramTool from '@/components/MultipleWordsAnagramTool';
 
-// 强制静态生成
-export const dynamic = 'force-static';
 export const revalidate = false;
 
 export const metadata: Metadata = {
-  title: 'Multiple Word Anagram Solver - Find Word Combinations',
-  description: 'Find multi-word anagrams and word combinations from your letters. Discover valid phrase anagrams quickly with smart filters to explore creative results.',
-  keywords: ['multiple word anagram', 'phrase anagram', 'anagram combinations', 'multi word solver'],
+  title: 'Anagram Solver Multiple Words - Free 2 & 3 Word Finder',
+  description:
+    'Use this free multiple word anagram solver to find exact 2-word and 3-word phrase anagrams. Filter by dictionary, word length, and required words.',
+  keywords: [
+    'anagram solver multiple words',
+    'multiple word anagram solver',
+    'two word anagram solver',
+    'multi word anagram solver',
+    'phrase anagram solver',
+  ],
   alternates: {
     canonical: 'https://anagram-solver.co/tools/multiple-words',
   },
   openGraph: {
-    title: 'Multiple Word Anagram Solver - Find Word Combinations',
-    description: 'Find multi-word anagrams and word combinations from your letters. Discover valid phrase anagrams quickly with smart filters to explore creative results.',
+    title: 'Anagram Solver Multiple Words - Free 2 & 3 Word Finder',
+    description:
+      'Find exact multi-word anagrams from names, phrases, and puzzle clues with fast filters for 2-word and 3-word results.',
     url: 'https://anagram-solver.co/tools/multiple-words',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Multiple Word Anagram Solver - Find Word Combinations',
-    description: 'Find multi-word anagrams and word combinations from your letters. Discover valid phrase anagrams quickly with smart filters to explore creative results.',
+    title: 'Anagram Solver Multiple Words - Free 2 & 3 Word Finder',
+    description:
+      'Find exact multi-word anagrams from names, phrases, and puzzle clues with fast filters for 2-word and 3-word results.',
   },
 };
 
+const faqs = [
+  {
+    question: 'Does this solver use every letter?',
+    answer:
+      'Yes. The multiple word anagram solver ignores spaces and punctuation, then returns phrases that use every input letter exactly once.',
+  },
+  {
+    question: 'Can I find exactly two-word anagrams?',
+    answer:
+      'Yes. Choose Exactly 2 words in the Word count filter to show only two-word anagram results.',
+  },
+  {
+    question: 'Why do some long phrases take longer?',
+    answer:
+      'Multi-word anagrams require checking many word combinations. The common dictionary is faster, while the full dictionary searches a wider word list.',
+  },
+  {
+    question: 'What does the Must include filter do?',
+    answer:
+      'Use Must include when one word is already known. For example, entering the as a required word will only show phrases containing the.',
+  },
+];
+
 export default function MultipleWordsPage() {
+  const structuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'Anagram Solver Multiple Words',
+      applicationCategory: 'GameApplication',
+      operatingSystem: 'Any',
+      url: 'https://anagram-solver.co/tools/multiple-words',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer,
+        },
+      })),
+    },
+  ];
+
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 to-blue-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-indigo-50 to-blue-100 dark:from-gray-900 dark:to-gray-800">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <Header />
 
       <main className="flex-1">
-        {/* Hero Section */}
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl dark:text-white">
-              Multiple Word Anagram Solver
+              Anagram Solver for Multiple Words
             </h1>
-            <p className="mx-auto mt-3 max-w-md text-base text-gray-500 sm:text-lg md:mt-5 md:max-w-3xl md:text-xl dark:text-gray-300">
-              Discover fascinating multi-word anagrams and phrase combinations. Transform single
-              words into multiple word phrases and explore creative anagram possibilities.
+            <p className="mx-auto mt-3 max-w-md text-base text-gray-600 sm:text-lg md:mt-5 md:max-w-3xl md:text-xl dark:text-gray-300">
+              Find exact 2-word and 3-word anagrams from names, phrases, and puzzle clues. Use every
+              letter once, filter by word length, and require a known word when you already have part
+              of the answer.
             </p>
           </div>
 
-          {/* Multiple Words Anagram Tool */}
           <MultipleWordsAnagramTool />
         </div>
 
-        {/* SEO Content Section */}
-        <div className="bg-white dark:bg-gray-900 py-16">
+        <div className="bg-white py-16 dark:bg-gray-900">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="prose prose-lg max-w-none dark:prose-invert">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Explore the Art of Multiple Word Anagrams
+                Find Phrase Anagrams That Use Every Letter
               </h2>
               <p className="text-gray-700 dark:text-gray-300">
-                Multiple word anagrams represent one of the most creative and challenging aspects of wordplay. Our multiple word anagram solver helps you discover fascinating phrase combinations that use the exact same letters as your original input. This advanced anagram tool can transform single words into meaningful phrases, names into descriptive sentences, or long phrases into completely different expressions. Multiple word anagrams have been used throughout history for entertainment, puzzles, and even secret messages, making our multiple word anagram solver both educational and entertaining.
+                This multiple word anagram solver is built for phrase anagrams, not just single-word
+                word lists. Enter a name, clue, or sentence fragment, and the tool searches for
+                combinations that use the same letters exactly once. That makes it useful for puzzle
+                solving, wordplay, classroom exercises, and checking whether a phrase can be turned
+                into a clean two-word or three-word anagram.
               </p>
 
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-12">
-                How Multiple Word Anagram Solving Works
+              <h2 className="mt-12 text-3xl font-bold text-gray-900 dark:text-white">
+                How to Search for Multiple Word Anagrams
               </h2>
               <p className="text-gray-700 dark:text-gray-300">
-                Our multiple word anagram solver uses sophisticated algorithms to find all possible combinations of words that use your input letters exactly once. Unlike single word anagrams, multiple word anagram solving requires checking millions of word combinations to find valid phrases. The multiple word anagram tool systematically explores different word lengths and combinations, ensuring that every letter from your original input is used exactly once in the final result. This comprehensive approach means our multiple word anagram solver can discover even the most obscure and creative phrase combinations that you might never find manually.
+                Start by entering your letters or phrase. Choose whether you want exactly two words
+                or exactly three words, then set a minimum word length to remove short filler words.
+                If you already know one word in the answer, add it to the Must include field. The
+                common dictionary is best for faster, readable results. The full dictionary is better
+                when you want a broader search and do not mind more unusual words.
               </p>
 
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-12">
-                Famous Multiple Word Anagrams in History
+              <h2 className="mt-12 text-3xl font-bold text-gray-900 dark:text-white">
+                Two-Word vs Three-Word Anagrams
               </h2>
               <p className="text-gray-700 dark:text-gray-300">
-                Multiple word anagrams have fascinated people for centuries, with some becoming famous for their cleverness or coincidental meaning. Classic examples include "SCHOOLMASTER" becoming "THE CLASSROOM" and "ASTRONOMER" transforming into "MOON STARER." Our multiple word anagram solver can help you discover similar amazing combinations from any input phrase. Historical figures have used multiple word anagrams for pseudonyms, and writers have employed them for character names and literary devices. The multiple word anagram solver reveals these hidden connections between seemingly unrelated phrases, showcasing the beautiful patterns within the English language.
+                Two-word anagrams are usually easier to scan and more likely to form memorable
+                phrases. Three-word anagrams can reveal more combinations, especially for longer
+                inputs, but they may include smaller words. Use the exact word count filter when a
+                puzzle clue says the answer has a specific number of words.
               </p>
 
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-12">
-                Creative Applications of Multiple Word Anagrams
+              <h2 className="mt-12 text-3xl font-bold text-gray-900 dark:text-white">
+                Examples to Try
+              </h2>
+              <ul className="text-gray-700 dark:text-gray-300">
+                <li>SCHOOLMASTER can produce THE + CLASSROOM.</li>
+                <li>THE EYES can produce THEY + SEE.</li>
+                <li>ASTRONOMER can produce MOON + STARER.</li>
+              </ul>
+
+              <h2 className="mt-12 text-3xl font-bold text-gray-900 dark:text-white">
+                Why No Result Appears
               </h2>
               <p className="text-gray-700 dark:text-gray-300">
-                Writers, poets, and creative professionals use our multiple word anagram solver for various artistic purposes. The tool can help generate unique character names, create memorable business names, or develop creative titles for projects. Multiple word anagram solving is also popular in puzzle creation, where constructors use our solver to develop challenging anagram puzzles for newspapers and magazines. Teachers use multiple word anagrams as educational tools to help students understand letter patterns and improve their vocabulary. The multiple word anagram solver makes these creative applications accessible to everyone, regardless of their experience with wordplay.
+                Multi-word anagrams are stricter than ordinary word finders because every letter has
+                to be used. If no result appears, lower the minimum word length, switch to the full
+                dictionary, remove the required word, or try exactly three words instead of exactly
+                two. Short inputs often do not have enough letters to form a useful phrase.
               </p>
 
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-12">
-                Advanced Features of Our Multiple Word Anagram Solver
+              <h2 className="mt-12 text-3xl font-bold text-gray-900 dark:text-white">
+                Frequently Asked Questions
               </h2>
-              <p className="text-gray-700 dark:text-gray-300">
-                Our multiple word anagram solver includes several advanced features that make it the most powerful tool available for multi-word anagram discovery. The solver can handle phrases up to 30 characters long and can find combinations of 2 or 3 words. The multiple word anagram tool automatically calculates Scrabble scores for each word combination, helping you identify the highest-scoring possibilities. Results are sorted by total point value, making it easy to find the most valuable combinations for word games. The multiple word anagram solver also handles spaces and punctuation intelligently, focusing on the actual letters while ignoring formatting characters.
-              </p>
-
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-12">
-                Tips for Getting Better Multiple Word Anagram Results
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300">
-                To get the best results from our multiple word anagram solver, start with longer input phrases of at least 8-10 letters. Shorter inputs may not have enough letters to form interesting multiple word combinations. Try using common phrases, famous names, or meaningful expressions as input for the multiple word anagram solver. The tool works best with inputs that have a good mix of vowels and consonants, as this provides more flexibility for word formation. If you don't find results immediately, try variations of your input phrase or consider removing less common letters. Remember that multiple word anagram solving is computationally intensive, so be patient while the solver explores all possible combinations.
-              </p>
-
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-12">
-                Why Choose Our Multiple Word Anagram Solver?
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300">
-                Our multiple word anagram solver stands out as the most comprehensive and user-friendly tool available for discovering multi-word anagram combinations. The solver uses advanced algorithms optimized for speed and accuracy, ensuring you get complete results quickly. Unlike basic anagram tools that only find single words, our multiple word anagram solver explores the full space of possible phrase combinations. The tool includes helpful features like score calculation, result sorting, and usage tips to enhance your anagram-solving experience. The multiple word anagram solver is completely free to use, requires no registration, and works perfectly on all devices, making it accessible to anyone interested in exploring the fascinating world of multi-word anagrams.
-              </p>
+              {faqs.map((faq) => (
+                <section key={faq.question} className="mt-6">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {faq.question}
+                  </h3>
+                  <p className="text-gray-700 dark:text-gray-300">{faq.answer}</p>
+                </section>
+              ))}
             </div>
 
-            {/* Internal Links Section */}
             <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <a
-                href="/"
+              <Link
+                href="/tools/two-word-anagram-solver"
                 className="block rounded-lg bg-indigo-50 p-6 hover:bg-indigo-100 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Anagram Solver
+                  Two Word Anagram Solver
                 </h3>
                 <p className="mt-2 text-gray-600 dark:text-gray-400">
-                  Find all possible single-word anagrams from any letters with our main tool.
+                  Focus on exact two-word phrase anagrams for names, clues, and short phrases.
                 </p>
-              </a>
+              </Link>
 
-              <a
-                href="/tools/scrabble-solver"
+              <Link
+                href="/tools/three-word-anagram-solver"
                 className="block rounded-lg bg-indigo-50 p-6 hover:bg-indigo-100 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Scrabble Solver
+                  Three Word Anagram Solver
                 </h3>
                 <p className="mt-2 text-gray-600 dark:text-gray-400">
-                  Find high-scoring Scrabble words from your tiles with specialized scoring.
+                  Explore exact three-word phrase anagrams for longer names and clues.
                 </p>
-              </a>
+              </Link>
 
-              <a
+              <Link
                 href="/tools/word-finder"
                 className="block rounded-lg bg-indigo-50 p-6 hover:bg-indigo-100 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
@@ -137,9 +211,9 @@ export default function MultipleWordsPage() {
                   Word Finder
                 </h3>
                 <p className="mt-2 text-gray-600 dark:text-gray-400">
-                  Create words from letters with pattern matching and wildcard support.
+                  Search words by letters, length, and wildcard patterns.
                 </p>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

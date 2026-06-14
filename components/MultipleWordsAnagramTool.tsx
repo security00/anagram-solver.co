@@ -4,28 +4,62 @@ import { useState } from 'react';
 import { findMultiWordAnagrams, calculateScore } from '@/lib/anagramSolver';
 import { getDictionaryAsync } from '@/lib/dictionary';
 
-export default function MultipleWordsAnagramTool() {
+type DictionaryType = 'common' | 'full';
+
+type ExamplePhrase = {
+  label: string;
+  value: string;
+};
+
+type MultipleWordsAnagramToolProps = {
+  defaultWordCount?: 2 | 3;
+  lockWordCount?: boolean;
+  examples?: ExamplePhrase[];
+};
+
+const DEFAULT_EXAMPLES: ExamplePhrase[] = [
+  { label: 'SCHOOLMASTER', value: 'schoolmaster' },
+  { label: 'THE EYES', value: 'the eyes' },
+  { label: 'ASTRONOMER', value: 'astronomer' },
+];
+
+export default function MultipleWordsAnagramTool({
+  defaultWordCount = 2,
+  lockWordCount = false,
+  examples = DEFAULT_EXAMPLES,
+}: MultipleWordsAnagramToolProps) {
   const [input, setInput] = useState('');
-  const [maxWords, setMaxWords] = useState(2);
+  const [wordCount, setWordCount] = useState<2 | 3>(defaultWordCount);
+  const [minWordLength, setMinWordLength] = useState(2);
+  const [containsWord, setContainsWord] = useState('');
+  const [resultLimit, setResultLimit] = useState(250);
   const [results, setResults] = useState<string[][]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
   const [loading, setLoading] = useState(false);
-  // Default to 'common' for faster multi-word search
-  const [dictionaryType, setDictionaryType] = useState<'common' | 'full'>('common');
+  const [dictionaryType, setDictionaryType] = useState<DictionaryType>('common');
+
+  const handleExampleClick = (value: string) => {
+    setInput(value);
+    setResults([]);
+    setHasSearched(false);
+  };
 
   const handleSolve = async () => {
     if (!input.trim()) return;
 
     setLoading(true);
+    setHasSearched(true);
     const dictionary = await getDictionaryAsync(dictionaryType);
-    // Use optimized multi-word solver with a reasonable results cap
-    const multiWordAnagrams = findMultiWordAnagrams(
-      input.toLowerCase(),
-      dictionary,
-      maxWords,
-      { maxResults: 200, minWordLength: 2 }
-    );
+    const normalizedContains = containsWord.trim().toLowerCase().replace(/[^a-z]/g, '');
+    const multiWordAnagrams = findMultiWordAnagrams(input, dictionary, wordCount, {
+      maxResults: resultLimit,
+      minWordLength,
+      exactWordCount: wordCount,
+    }).filter((combination) => {
+      if (!normalizedContains) return true;
+      return combination.includes(normalizedContains);
+    });
 
-    // Sort by total score (sum of all words in the combination)
     const sortedResults = multiWordAnagrams.sort((a, b) => {
       const scoreA = a.reduce((sum, word) => sum + calculateScore(word), 0);
       const scoreB = b.reduce((sum, word) => sum + calculateScore(word), 0);
@@ -41,31 +75,50 @@ export default function MultipleWordsAnagramTool() {
   };
 
   return (
-    <div className="mx-auto mt-12 max-w-4xl">
+    <div className="mx-auto mt-12 max-w-5xl">
       <div className="rounded-lg bg-white p-8 shadow-xl dark:bg-gray-800">
         <div className="space-y-6">
-          {/* Main input */}
           <div>
             <label
               htmlFor="input"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-              Enter letters or phrase to find multi-word anagrams
+              Enter letters or a phrase
             </label>
             <input
               type="text"
               id="input"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSolve()}
-              placeholder="e.g., SCHOOLMASTER or LISTEN SILENT"
-              className="mt-1 block w-full rounded-md border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-lg"
+              onKeyDown={(e) => e.key === 'Enter' && handleSolve()}
+              placeholder="e.g., SCHOOLMASTER, THE EYES, or ASTRONOMER"
+              className="mt-1 block w-full rounded-md border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-lg"
               maxLength={30}
             />
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Spaces and punctuation are ignored. Results use every letter exactly once.
+            </p>
           </div>
 
-          {/* Options */}
-          <div className="flex items-center space-x-6">
+          {examples.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Try:
+              </span>
+              {examples.map((example) => (
+                <button
+                  key={example.value}
+                  type="button"
+                  onClick={() => handleExampleClick(example.value)}
+                  className="rounded-md border border-indigo-200 bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-indigo-200 dark:hover:bg-gray-600"
+                >
+                  {example.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div>
               <label
                 htmlFor="dictionaryType"
@@ -76,28 +129,93 @@ export default function MultipleWordsAnagramTool() {
               <select
                 id="dictionaryType"
                 value={dictionaryType}
-                onChange={(e) => setDictionaryType(e.target.value as 'common' | 'full')}
-                className="mt-1 block rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                onChange={(e) => setDictionaryType(e.target.value as DictionaryType)}
+                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               >
-                <option value="full">Full (comprehensive)</option>
                 <option value="common">Common (faster)</option>
+                <option value="full">Full (comprehensive)</option>
               </select>
             </div>
+
             <div>
               <label
-                htmlFor="maxWords"
+                htmlFor="wordCount"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                Maximum number of words
+                Word count
+              </label>
+              {lockWordCount ? (
+                <div className="mt-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                  Exactly {wordCount} words
+                </div>
+              ) : (
+                <select
+                  id="wordCount"
+                  value={wordCount}
+                  onChange={(e) => setWordCount(Number(e.target.value) as 2 | 3)}
+                  className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value={2}>Exactly 2 words</option>
+                  <option value={3}>Exactly 3 words</option>
+                </select>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="minWordLength"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Min word length
               </label>
               <select
-                id="maxWords"
-                value={maxWords}
-                onChange={(e) => setMaxWords(Number(e.target.value))}
-                className="mt-1 block rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                id="minWordLength"
+                value={minWordLength}
+                onChange={(e) => setMinWordLength(Number(e.target.value))}
+                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               >
-                <option value={2}>2 words</option>
-                <option value={3}>3 words</option>
+                <option value={2}>2 letters</option>
+                <option value={3}>3 letters</option>
+                <option value={4}>4 letters</option>
+                <option value={5}>5 letters</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="containsWord"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Must include
+              </label>
+              <input
+                type="text"
+                id="containsWord"
+                value={containsWord}
+                onChange={(e) => setContainsWord(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSolve()}
+                placeholder="optional"
+                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                maxLength={15}
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="resultLimit"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Results
+              </label>
+              <select
+                id="resultLimit"
+                value={resultLimit}
+                onChange={(e) => setResultLimit(Number(e.target.value))}
+                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              >
+                <option value={100}>100</option>
+                <option value={250}>250</option>
+                <option value={500}>500</option>
               </select>
             </div>
           </div>
@@ -105,66 +223,72 @@ export default function MultipleWordsAnagramTool() {
           <button
             onClick={handleSolve}
             disabled={!input.trim() || loading}
-            className="w-full rounded-md bg-indigo-600 px-4 py-3 text-lg font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full rounded-md bg-indigo-600 px-4 py-3 text-lg font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? 'Finding Multi-Word Anagrams...' : 'Find Multi-Word Anagrams'}
           </button>
 
           {loading && (
             <div className="text-center text-gray-600 dark:text-gray-400">
-              <p>This may take a moment for longer phrases...</p>
+              <p>This may take a moment for longer phrases or the full dictionary.</p>
             </div>
           )}
 
           {results.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
                 Found {results.length} multi-word anagram{results.length !== 1 ? 's' : ''}:
               </h3>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
+              <div className="max-h-96 space-y-3 overflow-y-auto">
                 {results.map((wordCombination, index) => (
                   <div
                     key={index}
-                    className="rounded-md bg-indigo-50 px-4 py-3 border border-indigo-200 dark:bg-gray-700 dark:border-gray-600"
+                    className="rounded-md border border-indigo-200 bg-indigo-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-indigo-900 dark:text-white text-lg">
-                        {wordCombination.map(word => word.toUpperCase()).join(' + ')}
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <span className="text-lg font-medium text-indigo-900 dark:text-white">
+                        {wordCombination.map((word) => word.toUpperCase()).join(' + ')}
                       </span>
-                      <div className="text-sm text-indigo-700 dark:text-gray-300">
+                      <div className="shrink-0 text-sm text-indigo-700 dark:text-gray-300">
                         Total: {getTotalScore(wordCombination)} points
                       </div>
                     </div>
-                    <div className="text-sm text-indigo-600 dark:text-gray-400 mt-1">
+                    <div className="mt-1 text-sm text-indigo-600 dark:text-gray-400">
                       {wordCombination.map((word, wordIndex) => (
                         <span key={wordIndex}>
                           {word} ({calculateScore(word)} pts)
-                          {wordIndex < wordCombination.length - 1 ? ' • ' : ''}
+                          {wordIndex < wordCombination.length - 1 ? ' - ' : ''}
                         </span>
                       ))}
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard?.writeText(wordCombination.join(' '))}
+                      className="mt-3 rounded-md bg-white px-3 py-1 text-sm font-medium text-indigo-700 shadow-sm hover:bg-indigo-100 dark:bg-gray-800 dark:text-indigo-200 dark:hover:bg-gray-600"
+                    >
+                      Copy phrase
+                    </button>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {results.length === 0 && !loading && input.trim() && (
-            <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-              <p>No multi-word anagrams found. Try a different phrase or longer input.</p>
+          {results.length === 0 && hasSearched && !loading && (
+            <div className="py-8 text-center text-gray-500 dark:text-gray-400">
+              <p>No multi-word anagrams found. Try a longer phrase, a lower minimum length, or the full dictionary.</p>
             </div>
           )}
 
-          {/* Usage tips */}
-          <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-              Tips for Better Results:
+          <div className="mt-8 rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
+            <h4 className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Tips for better results
             </h4>
-            <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-              <div>• Use longer phrases (8+ letters) for more interesting combinations</div>
-              <div>• Try famous phrases, names, or common expressions</div>
-              <div>• Examples: "SCHOOLMASTER" → "THE CLASSROOM"</div>
-              <div>• "LISTEN SILENT" → "ENLIST" + "SILENT"</div>
+            <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+              <div>- Use longer phrases with 8 or more letters for better combinations.</div>
+              <div>- Try names, famous phrases, or puzzle clues.</div>
+              <div>- Example: SCHOOLMASTER can become THE + CLASSROOM.</div>
+              <div>- Use Must include when you already know one word in the answer.</div>
             </div>
           </div>
         </div>

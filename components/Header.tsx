@@ -11,6 +11,7 @@ export default function Header() {
     { name: 'Scrabble Solver', href: '/tools/scrabble-solver' },
     { name: 'Word Finder', href: '/tools/word-finder' },
     { name: 'Multiple Words', href: '/tools/multiple-words' },
+    { name: '2 Word Anagrams', href: '/tools/two-word-anagram-solver' },
     { name: 'About', href: '/about' },
     { name: 'FAQ', href: '/faq' },
   ];
@@ -46,13 +47,13 @@ export default function Header() {
           {/* Desktop navigation */}
           <div className="hidden lg:flex lg:items-center lg:space-x-6">
             {navigation.map((item) => (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
                 className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -104,14 +105,14 @@ export default function Header() {
           <div className="lg:hidden">
             <div className="space-y-1 px-2 pb-3 pt-2">
               {navigation.map((item) => (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
                   className="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-400"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
