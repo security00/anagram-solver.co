@@ -1,202 +1,149 @@
 'use client';
 
 import { useState } from 'react';
-import { findAnagrams, sortResults, calculateScore } from '@/lib/anagramSolver';
-import { getDictionaryAsync } from '@/lib/dictionary';
+import { calculateRackScore, calculateScore } from '@/lib/anagramSolver';
+import { runWordSolverQuery } from '@/lib/solverClient';
+import type { DictionaryType } from '@/lib/dictionaryData';
+import { getRackPlacement } from '@/lib/solverEngine';
+
+const RESULT_LIMIT = 500;
+const PAGE_SIZE = 100;
 
 export default function ScrabbleSolverTool() {
   const [tiles, setTiles] = useState('');
   const [prefix, setPrefix] = useState('');
   const [suffix, setSuffix] = useState('');
-  const [minLength, setMinLength] = useState(3);
+  const [minLength, setMinLength] = useState(2);
+  const [dictionaryType, setDictionaryType] = useState<DictionaryType>('common');
   const [results, setResults] = useState<string[]>([]);
+  const [total, setTotal] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(false);
-  const [dictionaryType, setDictionaryType] = useState<'common' | 'full'>('full');
-  // Track whether user has attempted a search so we can show an empty state
   const [searched, setSearched] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSolve = async () => {
-    // Normalize inputs for consistent behavior
-    const tilesTrim = tiles.trim();
-    const prefixTrim = prefix.trim();
-    const suffixTrim = suffix.trim();
-
-    // Allow searching by prefix/suffix even if no tiles are provided
-    if (!tilesTrim && !prefixTrim && !suffixTrim) return;
+    const rack = tiles.trim();
+    if (!rack) return;
 
     setLoading(true);
     setSearched(true);
-    // Load selected dictionary asynchronously ('full' uses words_alpha)
-    const dictionary = await getDictionaryAsync(dictionaryType);
-    // If tiles are provided, use anagram search; otherwise start from full dictionary
-    let anagrams = tilesTrim
-      ? findAnagrams(tilesTrim.toLowerCase(), dictionary)
-      : Array.from(dictionary);
-
-      // Filter by prefix and suffix if provided
-      if (prefixTrim) {
-        anagrams = anagrams.filter((word) =>
-          word.toLowerCase().startsWith(prefixTrim.toLowerCase())
-        );
-      }
-
-      if (suffixTrim) {
-        anagrams = anagrams.filter((word) =>
-          word.toLowerCase().endsWith(suffixTrim.toLowerCase())
-        );
-      }
-
-    // Filter by minimum length
-    anagrams = anagrams.filter((word) => word.length >= minLength);
-
-    // Sort by Scrabble score (highest first)
-    const sorted = sortResults(anagrams, 'score');
-    setResults(sorted);
-    setLoading(false);
+    setError('');
+    try {
+      const outcome = await runWordSolverQuery({
+        dictionaryType,
+        kind: 'words',
+        request: {
+          input: rack,
+          limit: RESULT_LIMIT,
+          minLength,
+          operation: 'scrabble',
+          prefix,
+          sortBy: 'score',
+          suffix,
+        },
+      });
+      setResults(outcome.words);
+      setTotal(outcome.total);
+      setVisibleCount(PAGE_SIZE);
+    } catch (searchError) {
+      setResults([]);
+      setTotal(0);
+      setError(searchError instanceof Error ? searchError.message : 'Unable to search the dictionary.');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const scoreWord = (word: string) => tiles.trim()
+    ? calculateRackScore(getRackPlacement(word, prefix, suffix) ?? word, tiles)
+    : calculateScore(word);
 
   return (
     <div className="mx-auto mt-12 max-w-4xl">
-      <div className="rounded-lg bg-white p-8 shadow-xl dark:bg-gray-800">
+      <div className="rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800 sm:p-8">
         <div className="space-y-6">
-          {/* Main input */}
           <div>
-            <label
-              htmlFor="tiles"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Enter your Scrabble tiles
+            <label htmlFor="tiles" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Rack or available letters
             </label>
             <input
               type="text"
               id="tiles"
               value={tiles}
-              onChange={(e) => setTiles(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSolve()}
-              placeholder="e.g., ABCDEFG"
-              className="mt-1 block w-full rounded-md border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-lg"
+              onChange={(event) => setTiles(event.target.value)}
+              onKeyDown={(event) => event.key === 'Enter' && handleSolve()}
+              placeholder="e.g., ABCDEFG or C?T"
+              className="mt-1 block w-full rounded-md border-gray-300 px-4 py-3 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-lg"
               maxLength={15}
             />
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              A standard rack has seven tiles. Use ? or * for a blank tile; blanks score zero points.
+            </p>
           </div>
 
-          {/* Advanced filters */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-            <div>
-              <label
-                htmlFor="dictionaryType"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Dictionary
-              </label>
-              <select
-                id="dictionaryType"
-                value={dictionaryType}
-                onChange={(e) => setDictionaryType(e.target.value as 'common' | 'full')}
-                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                <option value="full">Full (comprehensive)</option>
-                <option value="common">Common (faster)</option>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Dictionary
+              <select value={dictionaryType} onChange={(event) => setDictionaryType(event.target.value as DictionaryType)} className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                <option value="common">Common English</option>
+                <option value="full">Extended English</option>
               </select>
-            </div>
-            <div>
-              <label
-                htmlFor="prefix"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Starts with (optional)
-              </label>
-              <input
-                type="text"
-                id="prefix"
-                value={prefix}
-                onChange={(e) => setPrefix(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSolve()}
-                placeholder="e.g., UN"
-                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                maxLength={5}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="suffix"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Ends with (optional)
-              </label>
-              <input
-                type="text"
-                id="suffix"
-                value={suffix}
-                onChange={(e) => setSuffix(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSolve()}
-                placeholder="e.g., ING"
-                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                maxLength={5}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="minLength"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Minimum length
-              </label>
-              <select
-                id="minLength"
-                value={minLength}
-                onChange={(e) => setMinLength(Number(e.target.value))}
-                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                <option value={2}>2 letters</option>
-                <option value={3}>3 letters</option>
-                <option value={4}>4 letters</option>
-                <option value={5}>5 letters</option>
-                <option value={6}>6 letters</option>
-                <option value={7}>7 letters</option>
+            </label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Fixed board prefix
+              <input value={prefix} onChange={(event) => setPrefix(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && handleSolve()} placeholder="optional" className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" maxLength={8} />
+            </label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Fixed board suffix
+              <input value={suffix} onChange={(event) => setSuffix(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && handleSolve()} placeholder="optional" className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white" maxLength={8} />
+            </label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Minimum length
+              <select value={minLength} onChange={(event) => setMinLength(Number(event.target.value))} className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                {[2, 3, 4, 5, 6, 7].map((length) => <option key={length} value={length}>{length} letters</option>)}
               </select>
-            </div>
+            </label>
           </div>
 
           <button
             onClick={handleSolve}
-            // Disable only when all inputs are empty or while loading
-            disabled={(tiles.trim().length === 0 && prefix.trim().length === 0 && suffix.trim().length === 0) || loading}
-            className="w-full rounded-md bg-green-600 px-4 py-3 text-lg font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!tiles.trim() || loading}
+            className="w-full rounded-md bg-green-600 px-4 py-3 text-lg font-semibold text-white shadow-sm hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? 'Finding Words...' : 'Find Scrabble Words'}
+            {loading ? 'Searching in the background…' : 'Find Rack Words'}
           </button>
 
-          {/* Results / Empty state */}
-          {searched && (
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Found {results.length} Scrabble word{results.length !== 1 ? 's' : ''} (sorted by score):
-              </h3>
-              {results.length === 0 ? (
-                <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-gray-700 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
-                  No words found. Try different tiles, adjust prefix/suffix, or lower the minimum length.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
-                  {results.map((word, index) => (
-                    <div
-                      key={index}
-                      className="rounded-md bg-green-50 px-4 py-3 text-center border border-green-200 dark:bg-gray-700 dark:border-gray-600"
-                    >
-                      <span className="font-bold text-green-900 dark:text-white text-lg">
-                        {word.toUpperCase()}
-                      </span>
-                      <div className="text-sm text-green-700 dark:text-gray-300 mt-1">
-                        {word.length} letters • {calculateScore(word)} points
-                      </div>
+          <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+            This uses an open English spelling list and Scrabble-style letter values. It is not an official tournament word authority, and scores exclude board multipliers.
+          </p>
+
+          <div aria-live="polite">
+            {error && <p className="rounded-md bg-red-50 p-4 text-red-800 dark:bg-red-950 dark:text-red-200">{error}</p>}
+            {!error && searched && !loading && total === 0 && (
+              <p className="rounded-md bg-gray-50 p-4 text-gray-700 dark:bg-gray-700 dark:text-gray-200">No matching rack words found.</p>
+            )}
+            {total > 0 && (
+              <div className="mt-6">
+                <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+                  Found {total} word{total === 1 ? '' : 's'}{total > results.length ? ` — showing the top ${results.length}` : ''}
+                </h3>
+                <div className="grid max-h-96 grid-cols-1 gap-3 overflow-y-auto sm:grid-cols-2 md:grid-cols-3">
+                  {results.slice(0, visibleCount).map((word) => (
+                    <div key={word} className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-center dark:border-gray-600 dark:bg-gray-700">
+                      <span className="text-lg font-bold text-green-900 dark:text-white">{word.toUpperCase()}</span>
+                      <div className="mt-1 text-sm text-green-700 dark:text-gray-300">{word.length} letters · {scoreWord(word)} rack points</div>
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
-          )}
+                {visibleCount < results.length && (
+                  <button type="button" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)} className="mt-4 w-full rounded-md border border-green-200 px-4 py-2 font-medium text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-200 dark:hover:bg-gray-700">
+                    Show more
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -1,14 +1,18 @@
 'use client';
 
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const navigation = [
     { name: 'Home', href: '/' },
-    { name: 'Scrabble Solver', href: '/tools/scrabble-solver' },
+    { name: 'Rack Word Finder', href: '/tools/scrabble-solver' },
     { name: 'Word Finder', href: '/tools/word-finder' },
     { name: 'Multiple Words', href: '/tools/multiple-words' },
     { name: '2 Word Anagrams', href: '/tools/two-word-anagram-solver' },
@@ -17,98 +21,68 @@ export default function Header() {
   ];
 
   return (
-    <header className="bg-white shadow-sm dark:bg-gray-900">
-      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Top">
-        <div className="flex w-full items-center justify-between border-b border-gray-200 py-4 dark:border-gray-700 lg:border-none">
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <span className="sr-only">Anagram Solver</span>
-              <div className="flex items-center space-x-2">
-                <svg
-                  className="h-8 w-8 text-blue-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                  />
-                </svg>
-                <span className="text-xl font-bold text-gray-900 dark:text-white">
-                  Anagram Solver
-                </span>
-              </div>
-            </Link>
-          </div>
+    <header className="relative z-40 border-b border-white/10 bg-[#061a38] text-white">
+      <nav className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12" aria-label="Primary navigation">
+        <div className="flex h-[74px] w-full items-center justify-between">
+          <Link href="/" className="flex items-center gap-3 rounded-sm" aria-label="Anagram Solver home">
+            <Image
+              src="/design/brand-mark.webp"
+              alt=""
+              width={38}
+              height={38}
+              priority
+              className="h-9 w-9"
+            />
+            <span className="text-lg font-bold tracking-[-0.02em] sm:text-xl">Anagram Solver</span>
+          </Link>
 
-          {/* Desktop navigation */}
-          <div className="hidden lg:flex lg:items-center lg:space-x-6">
+          <div className="hidden h-full lg:flex lg:items-center lg:gap-7">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+                aria-current={pathname === item.href ? 'page' : undefined}
+                className={`relative flex h-full items-center text-sm font-medium transition-colors ${
+                  pathname === item.href ? 'text-cyan-300' : 'text-slate-200 hover:text-white'
+                }`}
               >
                 {item.name}
+                {pathname === item.href && (
+                  <span className="absolute inset-x-0 bottom-0 h-0.5 bg-cyan-400" aria-hidden="true" />
+                )}
               </Link>
             ))}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="flex lg:hidden">
+          <div className="lg:hidden">
             <button
               type="button"
-              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700 dark:text-gray-300"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-white/15 text-white hover:bg-white/10"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-navigation"
             >
-              <span className="sr-only">Open main menu</span>
+              <span className="sr-only">{mobileMenuOpen ? 'Close main menu' : 'Open main menu'}</span>
               {mobileMenuOpen ? (
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <XMarkIcon className="h-6 w-6" aria-hidden="true" />
               ) : (
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                  />
-                </svg>
+                <Bars3Icon className="h-6 w-6" aria-hidden="true" />
               )}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden">
-            <div className="space-y-1 px-2 pb-3 pt-2">
+          <div id="mobile-navigation" className="border-t border-white/10 pb-5 pt-3 lg:hidden">
+            <div className="grid gap-1">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+                  aria-current={pathname === item.href ? 'page' : undefined}
+                  className={`rounded-md px-3 py-3 text-base font-medium ${
+                    pathname === item.href ? 'bg-cyan-400/10 text-cyan-300' : 'text-slate-200 hover:bg-white/10 hover:text-white'
+                  }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}

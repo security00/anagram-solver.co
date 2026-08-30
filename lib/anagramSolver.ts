@@ -3,13 +3,18 @@
  * Core algorithms for finding anagrams from given letters
  */
 
-// Find anagrams using character frequency matching (more efficient)
+// Find exact anagrams: every normalized input letter must be used once.
 export function findAnagrams(input: string, dictionary: Set<string>): string[] {
-  const inputFreq = getCharFrequency(input);
+  const normalizedInput = normalizeLetters(input);
+  const inputFreq = getCharFrequency(normalizedInput);
   const results: string[] = [];
 
   for (const word of dictionary) {
-    if (canFormWord(inputFreq, word)) {
+    const normalizedWord = normalizeLetters(word);
+    if (
+      normalizedWord.length === normalizedInput.length &&
+      canFormWord(inputFreq, normalizedWord)
+    ) {
       results.push(word);
     }
   }
@@ -17,13 +22,64 @@ export function findAnagrams(input: string, dictionary: Set<string>): string[] {
   return results;
 }
 
+// Find words that can be made from some or all of the supplied letters.
+export function findWordsFromLetters(input: string, dictionary: Set<string>): string[] {
+  const matchesRack = createWordFromLettersMatcher(input);
+  const results: string[] = [];
+
+  for (const word of dictionary) {
+    if (matchesRack(word)) results.push(word);
+  }
+
+  return results;
+}
+
+export function canBuildWordFromLetters(input: string, word: string): boolean {
+  return createWordFromLettersMatcher(input)(word);
+}
+
+export function createWordFromLettersMatcher(input: string): (word: string) => boolean {
+  const normalizedInput = normalizeLetters(input);
+  const wildcardCount = countWildcards(input);
+  const inputFrequency = getCharFrequency(normalizedInput);
+
+  return (word: string) => {
+    const normalizedWord = normalizeLetters(word);
+    return (
+      normalizedWord.length <= normalizedInput.length + wildcardCount &&
+      canFormWordWithWildcards(inputFrequency, normalizedWord, wildcardCount)
+    );
+  };
+}
+
+function countWildcards(input: string): number {
+  return [...input].filter(
+    (character) => character === '?' || character === '*'
+  ).length;
+}
+
+function canFormWordWithWildcards(
+  inputFreq: Map<string, number>,
+  word: string,
+  wildcardCount: number
+): boolean {
+  let wildcardsNeeded = 0;
+  for (const [char, count] of getCharFrequency(word)) {
+    wildcardsNeeded += Math.max(0, count - (inputFreq.get(char) || 0));
+    if (wildcardsNeeded > wildcardCount) return false;
+  }
+  return true;
+}
+
+export function normalizeLetters(value: string): string {
+  return value.toLowerCase().replace(/[^a-z]/g, '');
+}
+
 // Get character frequency map
 function getCharFrequency(str: string): Map<string, number> {
   const freq = new Map<string, number>();
-  for (const char of str.toLowerCase()) {
-    if (char !== ' ') {
-      freq.set(char, (freq.get(char) || 0) + 1);
-    }
+  for (const char of str) {
+    freq.set(char, (freq.get(char) || 0) + 1);
   }
   return freq;
 }
@@ -61,18 +117,37 @@ export function sortResults(
   }
 }
 
-// Calculate Scrabble-like score for a word
-export function calculateScore(word: string): number {
-  const scores: { [key: string]: number } = {
-    a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1, j: 8, k: 5, l: 1,
-    m: 3, n: 1, o: 1, p: 3, q: 10, r: 1, s: 1, t: 1, u: 1, v: 4, w: 4, x: 8,
-    y: 4, z: 10,
-  };
+const LETTER_SCORES: Record<string, number> = {
+  a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1, j: 8, k: 5, l: 1,
+  m: 3, n: 1, o: 1, p: 3, q: 10, r: 1, s: 1, t: 1, u: 1, v: 4, w: 4, x: 8,
+  y: 4, z: 10,
+};
 
+// Calculate a Scrabble-style face-value score without board multipliers.
+export function calculateScore(word: string): number {
   return word
     .toLowerCase()
     .split('')
-    .reduce((sum, char) => sum + (scores[char] || 0), 0);
+    .reduce((sum, char) => sum + (LETTER_SCORES[char] || 0), 0);
+}
+
+// Score a word against a rack, where letters represented by blank tiles score zero.
+export function calculateRackScore(word: string, rack: string): number {
+  const available = getCharFrequency(normalizeLetters(rack));
+  let blanks = [...rack].filter((character) => character === '?' || character === '*').length;
+  let score = 0;
+
+  for (const character of normalizeLetters(word)) {
+    const count = available.get(character) || 0;
+    if (count > 0) {
+      available.set(character, count - 1);
+      score += LETTER_SCORES[character] || 0;
+    } else if (blanks > 0) {
+      blanks--;
+    }
+  }
+
+  return score;
 }
 
 // Handle wildcard pattern matching (? = any letter)
@@ -81,10 +156,16 @@ export function findWithWildcards(
   dictionary: Set<string>
 ): string[] {
   const results: string[] = [];
-  const regex = new RegExp(`^${pattern.replace(/\?/g, '.')}$`, 'i');
+  const normalizedPattern = pattern.toLowerCase();
 
   for (const word of dictionary) {
-    if (regex.test(word)) {
+    const normalizedWord = word.toLowerCase();
+    if (
+      normalizedWord.length === normalizedPattern.length &&
+      [...normalizedPattern].every(
+        (character, index) => character === '?' || character === normalizedWord[index]
+      )
+    ) {
       results.push(word);
     }
   }
@@ -92,20 +173,55 @@ export function findWithWildcards(
   return results;
 }
 
-// Find multi-word anagrams
+export type MultiWordStopReason = 'result-limit' | 'search-budget' | 'time-limit';
+
+export type MultiWordSearchOptions = {
+  maxResults?: number;
+  minWordLength?: number;
+  exactWordCount?: number;
+  requiredWord?: string;
+  maxSearchStates?: number;
+  timeLimitMs?: number;
+};
+
+export type MultiWordSearchOutcome = {
+  results: string[][];
+  truncated: boolean;
+  stopReason?: MultiWordStopReason;
+  visitedStates: number;
+};
+
 export function findMultiWordAnagrams(
   input: string,
   dictionary: Set<string>,
   maxWords: number = 3,
-  options?: { maxResults?: number; minWordLength?: number; exactWordCount?: number }
+  options?: MultiWordSearchOptions
 ): string[][] {
-  // Faster implementation: prefilter candidates, use arrays for counts, memoize states, stop after a cap
+  return searchMultiWordAnagrams(input, dictionary, maxWords, options).results;
+}
+
+// Find multi-word anagrams with explicit work and time budgets.
+export function searchMultiWordAnagrams(
+  input: string,
+  dictionary: Set<string>,
+  maxWords: number = 3,
+  options?: MultiWordSearchOptions
+): MultiWordSearchOutcome {
+  // Prefilter candidates, use compact counts, and stop at explicit budgets.
   const maxResults = options?.maxResults ?? 200;
   const minLen = options?.minWordLength ?? 2;
+  const maxSearchStates = options?.maxSearchStates ?? 50_000;
+  const timeLimitMs = options?.timeLimitMs ?? 1_500;
+  const deadline = Date.now() + timeLimitMs;
+  const requiredWord = options?.requiredWord
+    ? normalizeLetters(options.requiredWord)
+    : '';
 
   const letters = input.toLowerCase().replace(/[^a-z]/g, '');
   const n = letters.length;
-  if (n === 0) return [];
+  if (n === 0) {
+    return { results: [], truncated: false, visitedStates: 0 };
+  }
 
   // Map 'a'..'z' to 0..25
   const makeCounts = (s: string): number[] => {
@@ -127,9 +243,17 @@ export function findMultiWordAnagrams(
     for (let i = 0; i < 26; i++) left[i] += add[i];
   };
   const remainingLen = (cnt: number[]): number => cnt.reduce((s, v) => s + v, 0);
-  const keyOf = (cnt: number[]): string => cnt.join(',');
-
   const inputCnt = makeCounts(letters);
+
+  if (
+    requiredWord &&
+    (requiredWord.length < minLen ||
+      requiredWord.length > n ||
+      !dictionary.has(requiredWord) ||
+      !canSubtract(inputCnt, makeCounts(requiredWord)))
+  ) {
+    return { results: [], truncated: false, visitedStates: 0 };
+  }
 
   // Prefilter dictionary to only words buildable from input and >= minLen and <= total length
   const candidates: { word: string; cnt: number[]; len: number }[] = [];
@@ -146,25 +270,46 @@ export function findMultiWordAnagrams(
   candidates.sort((a, b) => b.len - a.len || (a.word < b.word ? -1 : 1));
 
   const results: string[][] = [];
-  const memo = new Set<string>();
+  let stopReason: MultiWordStopReason | undefined;
+  let visitedStates = 0;
 
   function dfs(startIdx: number, rem: number[], chosen: string[]) {
-    if (results.length >= maxResults) return; // stop early
+    if (stopReason) return;
+
+    visitedStates++;
+    if (visitedStates >= maxSearchStates) {
+      stopReason = 'search-budget';
+      return;
+    }
+    if (Date.now() >= deadline) {
+      stopReason = 'time-limit';
+      return;
+    }
+    if (results.length >= maxResults) {
+      stopReason = 'result-limit';
+      return;
+    }
 
     const remLen = remainingLen(rem);
     if (remLen === 0) {
-      if (chosen.length > 0 && (!options?.exactWordCount || chosen.length === options.exactWordCount)) {
-        results.push([...chosen]);
+      if (
+        chosen.length > 0 &&
+        (!options?.exactWordCount || chosen.length === options.exactWordCount) &&
+        (!requiredWord || chosen.includes(requiredWord))
+      ) {
+        results.push(
+          [...chosen].sort((a, b) => b.length - a.length || a.localeCompare(b))
+        );
       }
       return;
     }
     if (chosen.length === maxWords) return;
 
-    const memoKey = chosen.length + '|' + keyOf(rem) + '|' + startIdx;
-    if (memo.has(memoKey)) return;
-    memo.add(memoKey);
-
     for (let i = startIdx; i < candidates.length; i++) {
+      if ((i & 255) === 0 && Date.now() >= deadline) {
+        stopReason = 'time-limit';
+        return;
+      }
       const c = candidates[i];
       // simple pruning: if word longer than remaining, skip
       if (c.len > remLen) continue;
@@ -177,61 +322,22 @@ export function findMultiWordAnagrams(
       chosen.pop();
       addInPlace(rem, c.cnt);
 
-      if (results.length >= maxResults) return;
+      if (stopReason) return;
     }
   }
 
-  dfs(0, inputCnt.slice(), []);
-  return results;
-}
-
-// Input validation
-export function validateInput(input: string): { valid: boolean; error?: string } {
-  if (!input || input.trim().length === 0) {
-    return { valid: false, error: 'Please enter at least one letter' };
+  const initialRemainder = inputCnt.slice();
+  const initialWords: string[] = [];
+  if (requiredWord) {
+    subtractInPlace(initialRemainder, makeCounts(requiredWord));
+    initialWords.push(requiredWord);
   }
 
-  if (input.length > 20) {
-    return { valid: false, error: 'Maximum 20 letters allowed' };
-  }
-
-  return { valid: true };
-}
-
-// Permutation generator for word solving (for smaller inputs)
-export function generatePermutations(str: string): Set<string> {
-  const result = new Set<string>();
-
-  if (str.length === 0) {
-    result.add('');
-    return result;
-  }
-
-  for (let i = 0; i < str.length; i++) {
-    const char = str[i];
-    const remaining = str.slice(0, i) + str.slice(i + 1);
-    const perms = generatePermutations(remaining);
-
-    for (const perm of perms) {
-      result.add(char + perm);
-    }
-  }
-
-  return result;
-}
-
-// Filter permutations that are valid English words
-export function filterValidWords(
-  permutations: Set<string>,
-  dictionary: Set<string>
-): string[] {
-  const validWords: string[] = [];
-
-  for (const word of permutations) {
-    if (dictionary.has(word.toLowerCase())) {
-      validWords.push(word.toLowerCase());
-    }
-  }
-
-  return [...new Set(validWords)]; // Remove duplicates
+  dfs(0, initialRemainder, initialWords);
+  return {
+    results,
+    truncated: Boolean(stopReason),
+    stopReason,
+    visitedStates,
+  };
 }

@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# anagram-solver.co
 
-## Getting Started
+A static Next.js site with four distinct browser-side search modes:
 
-First, run the development server:
+- exact single-word anagrams using every input letter once;
+- words made from some or all available letters;
+- fixed-length `?` pattern matching and rack blanks;
+- exact two- and three-word phrase anagrams with bounded search.
+
+The dictionaries and solver run inside a Web Worker. There is no application
+search API, so CPU-heavy searches do not block the page or require a server.
+
+## Local development
+
+Requires Node.js 20 or newer.
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Quality checks:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm test
+npm run lint
+npm run build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Preview the production export through Cloudflare's local Workers runtime:
 
-## Learn More
+```bash
+npm run preview
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Cloudflare Workers deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`next.config.ts` statically exports the site to `out/`. `wrangler.jsonc` publishes
+that directory with Workers Static Assets; it does not use Cloudflare Pages or a
+Node.js Worker runtime.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Manual deployment after authenticating Wrangler:
 
-## Deploy on Vercel
+```bash
+npm run deploy
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The GitHub Actions workflow tests, lints, builds, and runs `wrangler deploy` on
+pushes to `main` or `master`. Configure these repository secrets:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `CLOUDFLARE_API_TOKEN`: token with Workers Scripts edit permissions
+- `CLOUDFLARE_ACCOUNT_ID`: the target Cloudflare account ID
+
+After the first Workers deployment, attach `anagram-solver.co` as a custom domain
+to the `anagram-solver-co` Worker in Cloudflare. Remove the old Pages custom-domain
+mapping only after the Workers hostname has been verified.
+
+## Dictionary provenance
+
+The Common and Extended lists are generated from ESDB/SCOWL data. See
+[`public/dictionaries/README.md`](public/dictionaries/README.md) for sizes,
+provenance, limitations, and the required license notice.

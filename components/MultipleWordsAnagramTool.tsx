@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { findMultiWordAnagrams, calculateScore } from '@/lib/anagramSolver';
-import { getDictionaryAsync } from '@/lib/dictionary';
+import { calculateScore } from '@/lib/anagramSolver';
+import { runMultiWordSolverQuery } from '@/lib/solverClient';
+import type { DictionaryType } from '@/lib/dictionaryData';
 
-type DictionaryType = 'common' | 'full';
 
 type ExamplePhrase = {
   label: string;
@@ -37,11 +37,15 @@ export default function MultipleWordsAnagramTool({
   const [hasSearched, setHasSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dictionaryType, setDictionaryType] = useState<DictionaryType>('common');
+  const [error, setError] = useState('');
+  const [truncationMessage, setTruncationMessage] = useState('');
 
   const handleExampleClick = (value: string) => {
     setInput(value);
     setResults([]);
     setHasSearched(false);
+    setError('');
+    setTruncationMessage('');
   };
 
   const handleSolve = async () => {
@@ -49,25 +53,37 @@ export default function MultipleWordsAnagramTool({
 
     setLoading(true);
     setHasSearched(true);
-    const dictionary = await getDictionaryAsync(dictionaryType);
-    const normalizedContains = containsWord.trim().toLowerCase().replace(/[^a-z]/g, '');
-    const multiWordAnagrams = findMultiWordAnagrams(input, dictionary, wordCount, {
-      maxResults: resultLimit,
-      minWordLength,
-      exactWordCount: wordCount,
-    }).filter((combination) => {
-      if (!normalizedContains) return true;
-      return combination.includes(normalizedContains);
-    });
+    setError('');
+    setTruncationMessage('');
+    try {
+      const outcome = await runMultiWordSolverQuery({
+        dictionaryType,
+        input,
+        kind: 'multi',
+        options: {
+          maxResults: resultLimit,
+          maxSearchStates: 50_000,
+          minWordLength,
+          requiredWord: containsWord,
+          timeLimitMs: 1_500,
+        },
+        wordCount,
+      });
 
-    const sortedResults = multiWordAnagrams.sort((a, b) => {
-      const scoreA = a.reduce((sum, word) => sum + calculateScore(word), 0);
-      const scoreB = b.reduce((sum, word) => sum + calculateScore(word), 0);
-      return scoreB - scoreA;
-    });
-
-    setResults(sortedResults);
-    setLoading(false);
+      setResults(outcome.results);
+      if (outcome.truncated) {
+        setTruncationMessage(
+          outcome.stopReason === 'result-limit'
+            ? `Showing the first ${outcome.results.length} combinations.`
+            : 'Search stopped at the performance limit. Add a required word, raise the minimum length, or use the common dictionary to narrow it.'
+        );
+      }
+    } catch (searchError) {
+      setResults([]);
+      setError(searchError instanceof Error ? searchError.message : 'Unable to search phrase anagrams.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getTotalScore = (words: string[]) => {
@@ -132,8 +148,8 @@ export default function MultipleWordsAnagramTool({
                 onChange={(e) => setDictionaryType(e.target.value as DictionaryType)}
                 className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               >
-                <option value="common">Common (faster)</option>
-                <option value="full">Full (comprehensive)</option>
+                <option value="common">Common English (faster)</option>
+                <option value="full">Extended English</option>
               </select>
             </div>
 
@@ -231,6 +247,18 @@ export default function MultipleWordsAnagramTool({
           {loading && (
             <div className="text-center text-gray-600 dark:text-gray-400">
               <p>This may take a moment for longer phrases or the full dictionary.</p>
+            </div>
+          )}
+
+          {error && (
+            <div aria-live="polite" className="rounded-md bg-red-50 p-4 text-red-800 dark:bg-red-950 dark:text-red-200">
+              {error}
+            </div>
+          )}
+
+          {truncationMessage && !loading && (
+            <div aria-live="polite" className="rounded-md bg-amber-50 p-4 text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+              {truncationMessage}
             </div>
           )}
 

@@ -1,171 +1,157 @@
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import {
+  ArrowRightIcon,
+  BoltIcon,
+  MagnifyingGlassIcon,
+  Squares2X2Icon,
+} from '@heroicons/react/24/outline';
+import Image from 'next/image';
+import Link from 'next/link';
 import AnagramSolverTool from '@/components/AnagramSolverTool';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
 
-// 强制静态生成
 export const dynamic = 'force-static';
 export const revalidate = false;
 
+const exampleSource = ['L', 'I', 'S', 'T', 'E', 'N'];
+const exampleResult = ['S', 'I', 'L', 'E', 'N', 'T'];
+
 export default function HomePage() {
-
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen flex-col bg-[#fcfdfd]">
       <Header />
-
       <main className="flex-1">
-        {/* Hero Section with Tool */}
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl dark:text-white">
-              Free Anagram Solver Tool
-            </h1>
-            <p className="mx-auto mt-3 max-w-md text-base text-gray-500 sm:text-lg md:mt-5 md:max-w-3xl md:text-xl dark:text-gray-300">
-              Solve anagrams instantly with our powerful anagram solver. Find all possible words
-              from your letters for Scrabble, crossword puzzles, and word games.
-            </p>
+        <section className="relative overflow-hidden border-b border-[#09c4d8] bg-[#fcfdfd]">
+          <div className="pointer-events-none absolute right-0 top-0 hidden h-[400px] w-[58%] lg:block" aria-hidden="true">
+            <Image
+              src="/design/blueprint-letters.webp"
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 1024px) 58vw, 0vw"
+              className="object-cover object-left-top opacity-75"
+            />
           </div>
 
-          {/* Anagram Solver Tool */}
-          <AnagramSolverTool />
-        </div>
-
-        {/* SEO Content Section */}
-        <div className="bg-white dark:bg-gray-900 py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="prose prose-lg max-w-none dark:prose-invert">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                What is an Anagram Solver?
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300">
-                An anagram solver is a powerful tool that helps you find all possible words that can
-                be created by rearranging the letters of a given word or phrase. Our free anagram
-                solver uses advanced algorithms to quickly analyze your input and generate every
-                valid anagram combination. Whether you're playing Scrabble, solving crossword
-                puzzles, or simply exploring word games, our anagram solver provides instant results
-                to help you discover new words and improve your vocabulary.
-              </p>
-
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-12">
-                How to Use Our Anagram Solver Tool
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300">
-                Using our anagram solver is incredibly simple and efficient. First, enter the
-                letters you want to unscramble into the input field above. Our anagram solver
-                accepts up to 20 letters at a time. Next, choose how you want to sort the results:
-                by word length, alphabetically, or by Scrabble score. Then click the "Solve
-                Anagram" button, and our anagram solver will instantly display all valid English
-                words that can be formed from your letters. The anagram solver shows each word along
-                with its Scrabble point value, making it perfect for competitive word games.
-              </p>
-
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-12">
-                Benefits of Using an Anagram Solver
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300">
-                Our anagram solver offers numerous benefits for word game enthusiasts and language
-                learners. The anagram solver helps you discover new words you might not have known
-                existed, expanding your vocabulary significantly. When playing Scrabble or Words
-                with Friends, the anagram solver can help you find high-scoring words quickly. For
-                crossword puzzle solvers, our anagram solver is invaluable in finding words that fit
-                specific letter patterns. Students and educators also use our anagram solver as a
-                learning tool to understand word formation and improve spelling skills. The anagram
-                solver is completely free to use, with no registration required, making it accessible
-                to everyone who needs help with word puzzles and games.
-              </p>
-
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-12">
-                Advanced Features of Our Anagram Solver
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300">
-                Our anagram solver includes several advanced features that set it apart from other
-                word finding tools. The anagram solver supports multiple sorting options, allowing
-                you to organize results by length, alphabetical order, or Scrabble score. This makes
-                it easy to find the perfect word for any situation. Our anagram solver uses a
-                comprehensive English dictionary containing thousands of valid words, ensuring you
-                won't miss any possible combinations. The anagram solver also displays Scrabble
-                point values for each word, helping you make strategic decisions in word games. For
-                serious players, our anagram solver can handle complex letter combinations and find
-                even the most obscure valid words.
-              </p>
-
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-12">
-                Anagram Solver Strategies and Tips
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300">
-                To get the most out of our anagram solver, consider these helpful strategies. When
-                using the anagram solver for Scrabble, focus on finding longer words first, as they
-                typically score more points. The anagram solver can help you identify common letter
-                patterns and prefixes that frequently form words. Try using the anagram solver with
-                different combinations of your available letters to explore all possibilities. For
-                crossword puzzles, the anagram solver excels at finding words that match specific
-                letter patterns. Regular use of our anagram solver can help you memorize common
-                anagrams and improve your word game performance over time. Remember that practice
-                with the anagram solver will naturally enhance your ability to spot anagrams without
-                assistance.
-              </p>
-
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-12">
-                Why Choose Our Free Anagram Solver?
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300">
-                Our anagram solver stands out as the best free tool available for several reasons.
-                The anagram solver features a clean, user-friendly interface that works perfectly on
-                both desktop and mobile devices. Unlike other anagram solver tools that require
-                downloads or registrations, ours works instantly in your browser. Our anagram solver
-                is continuously updated with new words and improvements to ensure accuracy and
-                reliability. The anagram solver processes results quickly, even with complex letter
-                combinations, saving you valuable time. We've designed this anagram solver to be
-                completely free with no hidden costs or premium features, making powerful word
-                solving accessible to everyone. Whether you're a casual player or a serious
-                competitor, our anagram solver provides the tools you need to excel at word games.
+          <div className="relative z-10 mx-auto max-w-[1440px] px-5 pb-0 pt-14 sm:px-8 sm:pt-16 lg:px-12 lg:pt-[70px]">
+            <div className="max-w-[760px]">
+              <h1 className="text-[2.65rem] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#061a38] sm:text-6xl lg:text-[4rem]">
+                Find Every Word
+                <br />
+                Hidden in Your Letters
+              </h1>
+              <p className="mt-6 max-w-xl text-lg leading-8 text-[#52657d] sm:text-xl">
+                Rearrange every letter in a word or phrase to find exact English anagrams.
               </p>
             </div>
 
-            {/* Internal Links Section */}
-            <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <a
-                href="/tools/scrabble-solver"
-                className="block rounded-lg bg-blue-50 p-6 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-              >
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Scrabble Solver
-                </h3>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">
-                  Find high-scoring Scrabble words from your tiles with our specialized Scrabble
-                  solver tool.
-                </p>
-              </a>
+            <AnagramSolverTool />
+          </div>
+        </section>
 
-              <a
-                href="/tools/word-finder"
-                className="block rounded-lg bg-blue-50 p-6 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-              >
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Word Finder
-                </h3>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">
-                  Create words from any letters with our powerful word finder and pattern matching
-                  tool.
-                </p>
-              </a>
+        <section className="bg-white py-12 sm:py-14" aria-labelledby="anagram-explainer-title">
+          <div className="mx-auto grid max-w-[1320px] gap-12 px-5 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-center lg:px-12">
+            <div>
+              <h2 id="anagram-explainer-title" className="text-3xl font-extrabold tracking-[-0.035em] text-[#061a38] sm:text-4xl">
+                What is an Anagram?
+              </h2>
+              <p className="mt-5 max-w-xl text-base leading-8 text-[#52657d]">
+                An anagram transposes all the letters of another word or phrase. LISTEN and SILENT
+                have the same six letters, each used exactly once. A shorter result belongs in Word
+                Finder instead because it does not use every letter.
+              </p>
+            </div>
 
-              <a
-                href="/tools/multiple-words"
-                className="block rounded-lg bg-blue-50 p-6 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-              >
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Multiple Word Anagrams
-                </h3>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">
-                  Discover multi-word anagrams and phrase combinations with our advanced solver.
-                </p>
-              </a>
+            <div className="grid gap-5 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
+              <LetterExample label="Your letters" letters={exampleSource} />
+              <ArrowRightIcon className="mx-auto h-7 w-7 rotate-90 text-[#00aebf] sm:mb-3 sm:rotate-0" aria-hidden="true" />
+              <LetterExample label="Anagram" letters={exampleResult} />
             </div>
           </div>
-        </div>
+        </section>
+
+        <section className="border-y border-[#d9e5ec] bg-[#f4f8fa] py-14 sm:py-16">
+          <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-12">
+            <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:items-start">
+              <div>
+                <BoltIcon className="h-8 w-8 text-[#00aebf]" aria-hidden="true" />
+                <h2 className="mt-5 text-2xl font-extrabold tracking-[-0.025em] text-[#061a38]">Fast, local solving</h2>
+                <p className="mt-4 max-w-lg leading-7 text-[#52657d]">
+                  The dictionary downloads once and searches run in a background browser worker,
+                  keeping the interface responsive and your letters in your browser.
+                </p>
+              </div>
+
+              <div className="divide-y divide-[#cfdde5] border-y border-[#cfdde5]">
+                <ToolLink
+                  href="/tools/word-finder"
+                  title="Word Finder"
+                  description="Make shorter words from available letters or match a fixed-length pattern."
+                  icon="search"
+                />
+                <ToolLink
+                  href="/tools/scrabble-solver"
+                  title="Rack Word Finder"
+                  description="Explore words from a tile rack, including zero-point blank tiles."
+                  icon="grid"
+                />
+                <ToolLink
+                  href="/tools/multiple-words"
+                  title="Multi-Word Anagrams"
+                  description="Split all input letters into exact two- or three-word phrases."
+                  icon="grid"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
-
       <Footer />
     </div>
+  );
+}
+
+function LetterExample({ label, letters }: { label: string; letters: string[] }) {
+  return (
+    <div>
+      <p className="mb-3 text-center text-xs font-extrabold uppercase tracking-[0.12em] text-[#52657d]">{label}</p>
+      <div className="grid grid-cols-6">
+        {letters.map((letter, index) => (
+          <span
+            key={`${letter}-${index}`}
+            className="flex aspect-square min-w-0 items-center justify-center border-y border-l border-[#8ed7e0] font-mono text-lg font-bold text-[#061a38] last:border-r sm:text-xl"
+          >
+            {letter}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ToolLink({
+  description,
+  href,
+  icon,
+  title,
+}: {
+  description: string;
+  href: string;
+  icon: 'grid' | 'search';
+  title: string;
+}) {
+  const Icon = icon === 'search' ? MagnifyingGlassIcon : Squares2X2Icon;
+
+  return (
+    <Link href={href} className="group grid gap-4 py-6 sm:grid-cols-[44px_1fr_auto] sm:items-center">
+      <span className="flex h-11 w-11 items-center justify-center border border-cyan-200 text-[#00aebf]" aria-hidden="true">
+        <Icon className="h-6 w-6" />
+      </span>
+      <span>
+        <span className="block font-bold text-[#061a38] transition-colors group-hover:text-[#008f9e]">{title}</span>
+        <span className="mt-1 block text-sm leading-6 text-[#52657d]">{description}</span>
+      </span>
+      <ArrowRightIcon className="hidden h-5 w-5 text-[#00aebf] transition-transform group-hover:translate-x-1 sm:block" aria-hidden="true" />
+    </Link>
   );
 }
