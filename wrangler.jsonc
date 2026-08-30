@@ -2,6 +2,12 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "anagram-solver-co",
   "compatibility_date": "2026-08-30",
+  "routes": [
+    {
+      "pattern": "anagram-solver.co/*",
+      "zone_name": "anagram-solver.co"
+    }
+  ],
   "assets": {
     "directory": "./out",
     "html_handling": "auto-trailing-slash",
