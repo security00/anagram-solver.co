@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import Footer from '@/components/Footer';
-import Header from '@/components/Header';
+import InnerPageShell, { InnerContent } from '@/components/InnerPageShell';
 
 export const dynamic = 'force-static';
 export const revalidate = false;
@@ -52,22 +51,21 @@ const faqs = [
 
 export default function FAQPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-50 to-blue-100 dark:from-gray-900 dark:to-gray-800">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl dark:text-white">Frequently Asked Questions</h1>
-          <div className="mt-10 space-y-5">
+    <InnerPageShell
+      eyebrow="Help center"
+      title="Frequently Asked Questions"
+      description="Answers about exact anagrams, rack words, wildcards, dictionaries, scoring, privacy, and performance."
+    >
+      <InnerContent>
+          <div className="faq-list">
             {faqs.map(({ answer, question }) => (
-              <details key={question} className="rounded-lg bg-white p-5 shadow-sm open:shadow-md dark:bg-gray-800">
-                <summary className="cursor-pointer text-lg font-semibold text-gray-900 dark:text-white">{question}</summary>
-                <p className="mt-3 leading-7 text-gray-700 dark:text-gray-300">{answer}</p>
+              <details key={question} className="faq-item">
+                <summary>{question}</summary>
+                <p>{answer}</p>
               </details>
             ))}
           </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+      </InnerContent>
+    </InnerPageShell>
   );
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import InnerPageShell, { InnerContent } from '@/components/InnerPageShell';
 
 // Static generation
 export const dynamic = 'force-static';
@@ -14,12 +13,13 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-zinc-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Privacy Policy</h1>
-          <div className="prose prose-lg mt-6 dark:prose-invert">
+    <InnerPageShell
+      eyebrow="Legal"
+      title="Privacy Policy"
+      description="How local solving, Cloudflare hosting, and optional analytics handle information."
+    >
+      <InnerContent>
+          <div className="editorial-copy">
             <p>
               The site does not require an account. Word searches run in a Web Worker in your
               browser and the application has no search API that receives the letters you enter.
@@ -53,11 +53,9 @@ export default function PrivacyPage() {
             </p>
             <h2>Contact</h2>
             <p>If you have questions about this policy, contact us on the Contact page.</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Last updated: August 30, 2026</p>
+            <p className="text-sm text-[#687b91]">Last updated: August 30, 2026</p>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+      </InnerContent>
+    </InnerPageShell>
   );
 }

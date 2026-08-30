@@ -57,44 +57,46 @@ export default function WordFinderTool() {
   const visibleResults = results.slice(0, visibleCount);
 
   return (
-    <div className="mx-auto mt-12 max-w-4xl">
-      <div className="rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800 sm:p-8">
+    <div className="tool-shell">
+      <div className="tool-primary-band">
+        <div className="grid gap-5 md:grid-cols-2">
+          <label className="tool-label tool-label-on-dark">
+            Make words from letters
+            <input
+              type="text"
+              value={letters}
+              onChange={(event) => {
+                setLetters(event.target.value);
+                if (event.target.value) setPattern('');
+              }}
+              onKeyDown={(event) => event.key === 'Enter' && handleSolve()}
+              placeholder="e.g., EXAMPLE"
+              className="tool-input tool-input-on-dark"
+              maxLength={20}
+            />
+          </label>
+
+          <label className="tool-label tool-label-on-dark">
+            Match a fixed-length pattern
+            <input
+              type="text"
+              value={pattern}
+              onChange={(event) => {
+                setPattern(event.target.value);
+                if (event.target.value) setLetters('');
+              }}
+              onKeyDown={(event) => event.key === 'Enter' && handleSolve()}
+              placeholder="e.g., C?T or ?ING"
+              className="tool-input tool-input-on-dark"
+              maxLength={20}
+            />
+            <span className="tool-help tool-help-on-dark">Use ? for exactly one unknown letter.</span>
+          </label>
+        </div>
+      </div>
+
+      <div className="tool-body">
         <div className="space-y-6">
-          <div className="grid gap-4 border-b border-gray-200 pb-6 dark:border-gray-700 md:grid-cols-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Make words from letters
-              <input
-                type="text"
-                value={letters}
-                onChange={(event) => {
-                  setLetters(event.target.value);
-                  if (event.target.value) setPattern('');
-                }}
-                onKeyDown={(event) => event.key === 'Enter' && handleSolve()}
-                placeholder="e.g., EXAMPLE"
-                className="mt-2 block w-full rounded-md border-gray-300 px-4 py-3 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-lg"
-                maxLength={20}
-              />
-            </label>
-
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Match a fixed-length pattern
-              <input
-                type="text"
-                value={pattern}
-                onChange={(event) => {
-                  setPattern(event.target.value);
-                  if (event.target.value) setLetters('');
-                }}
-                onKeyDown={(event) => event.key === 'Enter' && handleSolve()}
-                placeholder="e.g., C?T or ?ING"
-                className="mt-2 block w-full rounded-md border-gray-300 px-4 py-3 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-lg"
-                maxLength={20}
-              />
-              <span className="mt-1 block text-xs text-gray-500 dark:text-gray-400">Use ? for exactly one unknown letter.</span>
-            </label>
-          </div>
-
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <SelectField label="Dictionary" value={dictionaryType} onChange={(value) => setDictionaryType(value as DictionaryType)}>
               <option value="common">Common English</option>
@@ -116,31 +118,31 @@ export default function WordFinderTool() {
           <button
             onClick={handleSolve}
             disabled={(!letters.trim() && !pattern.trim()) || loading}
-            className="w-full rounded-md bg-purple-600 px-4 py-3 text-lg font-semibold text-white shadow-sm hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="tool-primary-button"
           >
             {loading ? 'Searching in the background…' : 'Find Words'}
           </button>
 
           <div aria-live="polite">
-            {error && <p className="rounded-md bg-red-50 p-4 text-red-800 dark:bg-red-950 dark:text-red-200">{error}</p>}
+            {error && <p className="tool-status tool-status-error">{error}</p>}
             {!error && searched && !loading && total === 0 && (
-              <p className="rounded-md bg-gray-50 p-4 text-gray-700 dark:bg-gray-700 dark:text-gray-200">No matching words found.</p>
+              <p className="tool-status">No matching words found.</p>
             )}
             {total > 0 && (
               <div className="mt-6">
-                <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="tool-results-heading">
                   Found {total} word{total === 1 ? '' : 's'}{total > results.length ? ` — showing the first ${results.length}` : ''}
                 </h3>
                 <div className="grid max-h-96 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
                   {visibleResults.map((word) => (
-                    <div key={word} className="rounded-md border border-purple-200 bg-purple-50 px-3 py-2 text-center dark:border-gray-600 dark:bg-gray-700">
-                      <span className="font-medium text-purple-900 dark:text-white">{word.toUpperCase()}</span>
-                      <span className="ml-2 text-xs text-purple-700 dark:text-gray-400">({calculateScore(word)})</span>
+                    <div key={word} className="tool-result-card text-center">
+                      <span className="tool-result-word">{word.toUpperCase()}</span>
+                      <span className="tool-result-meta ml-2">{calculateScore(word)} pts</span>
                     </div>
                   ))}
                 </div>
                 {visibleCount < results.length && (
-                  <button type="button" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)} className="mt-4 w-full rounded-md border border-purple-200 px-4 py-2 font-medium text-purple-700 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-200 dark:hover:bg-gray-700">
+                  <button type="button" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)} className="tool-secondary-button mt-4 w-full">
                     Show more
                   </button>
                 )}
@@ -148,7 +150,7 @@ export default function WordFinderTool() {
             )}
           </div>
 
-          <div className="rounded-lg bg-gray-50 p-4 text-sm text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+          <div className="tool-note">
             Pattern examples: <code>C?T</code> finds CAT/COT/CUT; <code>?ING</code> finds RING/SING/KING.
           </div>
         </div>
@@ -169,9 +171,9 @@ function SelectField({
   value: string | number;
 }) {
   return (
-    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+    <label className="tool-label">
       {label}
-      <select value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="tool-select">
         {children}
       </select>
     </label>

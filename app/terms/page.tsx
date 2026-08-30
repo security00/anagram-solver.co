@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import InnerPageShell, { InnerContent } from '@/components/InnerPageShell';
 
 export const dynamic = 'force-static';
 export const revalidate = false;
@@ -13,12 +12,13 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-zinc-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
-      <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Terms of Service</h1>
-          <div className="prose prose-lg mt-6 dark:prose-invert">
+    <InnerPageShell
+      eyebrow="Legal"
+      title="Terms of Service"
+      description="The basic terms that apply when you use these browser-based word tools."
+    >
+      <InnerContent>
+          <div className="editorial-copy">
             <p>By accessing or using this website, you agree to these terms.</p>
             <h2>Use of the Service</h2>
             <p>The tools provided are for personal and educational use. Do not misuse or attempt to disrupt the service.</p>
@@ -29,9 +29,7 @@ export default function TermsPage() {
             <h2>Changes</h2>
             <p>We may update these terms from time to time. Continued use constitutes acceptance of changes.</p>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+      </InnerContent>
+    </InnerPageShell>
   );
 }

@@ -91,54 +91,49 @@ export default function MultipleWordsAnagramTool({
   };
 
   return (
-    <div className="mx-auto mt-12 max-w-5xl">
-      <div className="rounded-lg bg-white p-8 shadow-xl dark:bg-gray-800">
-        <div className="space-y-6">
-          <div>
-            <label
-              htmlFor="input"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Enter letters or a phrase
-            </label>
-            <input
-              type="text"
-              id="input"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSolve()}
-              placeholder="e.g., SCHOOLMASTER, THE EYES, or ASTRONOMER"
-              className="mt-1 block w-full rounded-md border-gray-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-lg"
-              maxLength={30}
-            />
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              Spaces and punctuation are ignored. Results use every letter exactly once.
-            </p>
+    <div className="tool-shell">
+      <div className="tool-primary-band">
+        <label htmlFor="input" className="tool-label tool-label-on-dark">
+          Enter letters or a phrase
+          <input
+            type="text"
+            id="input"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSolve()}
+            placeholder="e.g., SCHOOLMASTER, THE EYES, or ASTRONOMER"
+            className="tool-input tool-input-on-dark"
+            maxLength={30}
+          />
+          <span className="tool-help tool-help-on-dark">
+            Spaces and punctuation are ignored. Results use every letter exactly once.
+          </span>
+        </label>
+
+        {examples.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-semibold text-slate-200">Try:</span>
+            {examples.map((example) => (
+              <button
+                key={example.value}
+                type="button"
+                onClick={() => handleExampleClick(example.value)}
+                className="tool-chip"
+              >
+                {example.label}
+              </button>
+            ))}
           </div>
+        )}
+      </div>
 
-          {examples.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Try:
-              </span>
-              {examples.map((example) => (
-                <button
-                  key={example.value}
-                  type="button"
-                  onClick={() => handleExampleClick(example.value)}
-                  className="rounded-md border border-indigo-200 bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-indigo-200 dark:hover:bg-gray-600"
-                >
-                  {example.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="tool-body">
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_0.75fr]">
             <div>
               <label
                 htmlFor="dictionaryType"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="tool-label"
               >
                 Dictionary
               </label>
@@ -146,7 +141,7 @@ export default function MultipleWordsAnagramTool({
                 id="dictionaryType"
                 value={dictionaryType}
                 onChange={(e) => setDictionaryType(e.target.value as DictionaryType)}
-                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="tool-select"
               >
                 <option value="common">Common English (faster)</option>
                 <option value="full">Extended English</option>
@@ -156,12 +151,12 @@ export default function MultipleWordsAnagramTool({
             <div>
               <label
                 htmlFor="wordCount"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="tool-label"
               >
                 Word count
               </label>
               {lockWordCount ? (
-                <div className="mt-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                <div className="tool-static-field">
                   Exactly {wordCount} words
                 </div>
               ) : (
@@ -169,7 +164,7 @@ export default function MultipleWordsAnagramTool({
                   id="wordCount"
                   value={wordCount}
                   onChange={(e) => setWordCount(Number(e.target.value) as 2 | 3)}
-                  className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className="tool-select"
                 >
                   <option value={2}>Exactly 2 words</option>
                   <option value={3}>Exactly 3 words</option>
@@ -180,7 +175,7 @@ export default function MultipleWordsAnagramTool({
             <div>
               <label
                 htmlFor="minWordLength"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="tool-label"
               >
                 Min word length
               </label>
@@ -188,7 +183,7 @@ export default function MultipleWordsAnagramTool({
                 id="minWordLength"
                 value={minWordLength}
                 onChange={(e) => setMinWordLength(Number(e.target.value))}
-                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="tool-select"
               >
                 <option value={2}>2 letters</option>
                 <option value={3}>3 letters</option>
@@ -200,7 +195,7 @@ export default function MultipleWordsAnagramTool({
             <div>
               <label
                 htmlFor="containsWord"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="tool-label"
               >
                 Must include
               </label>
@@ -211,7 +206,7 @@ export default function MultipleWordsAnagramTool({
                 onChange={(e) => setContainsWord(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSolve()}
                 placeholder="optional"
-                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="tool-input"
                 maxLength={15}
               />
             </div>
@@ -219,7 +214,7 @@ export default function MultipleWordsAnagramTool({
             <div>
               <label
                 htmlFor="resultLimit"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="tool-label"
               >
                 Results
               </label>
@@ -227,7 +222,7 @@ export default function MultipleWordsAnagramTool({
                 id="resultLimit"
                 value={resultLimit}
                 onChange={(e) => setResultLimit(Number(e.target.value))}
-                className="mt-1 block w-full rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="tool-select"
               >
                 <option value={100}>100</option>
                 <option value={250}>250</option>
@@ -239,49 +234,49 @@ export default function MultipleWordsAnagramTool({
           <button
             onClick={handleSolve}
             disabled={!input.trim() || loading}
-            className="w-full rounded-md bg-indigo-600 px-4 py-3 text-lg font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="tool-primary-button"
           >
             {loading ? 'Finding Multi-Word Anagrams...' : 'Find Multi-Word Anagrams'}
           </button>
 
           {loading && (
-            <div className="text-center text-gray-600 dark:text-gray-400">
+            <div className="text-center text-[#52657d]">
               <p>This may take a moment for longer phrases or the full dictionary.</p>
             </div>
           )}
 
           {error && (
-            <div aria-live="polite" className="rounded-md bg-red-50 p-4 text-red-800 dark:bg-red-950 dark:text-red-200">
+            <div aria-live="polite" className="tool-status tool-status-error">
               {error}
             </div>
           )}
 
           {truncationMessage && !loading && (
-            <div aria-live="polite" className="rounded-md bg-amber-50 p-4 text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+            <div aria-live="polite" className="tool-status tool-status-warning">
               {truncationMessage}
             </div>
           )}
 
           {results.length > 0 && (
             <div className="mt-6">
-              <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="tool-results-heading">
                 Found {results.length} multi-word anagram{results.length !== 1 ? 's' : ''}:
               </h3>
               <div className="max-h-96 space-y-3 overflow-y-auto">
                 {results.map((wordCombination, index) => (
                   <div
                     key={index}
-                    className="rounded-md border border-indigo-200 bg-indigo-50 px-4 py-3 dark:border-gray-600 dark:bg-gray-700"
+                    className="tool-result-card"
                   >
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <span className="text-lg font-medium text-indigo-900 dark:text-white">
+                      <span className="tool-result-word text-lg">
                         {wordCombination.map((word) => word.toUpperCase()).join(' + ')}
                       </span>
-                      <div className="shrink-0 text-sm text-indigo-700 dark:text-gray-300">
+                      <div className="tool-result-meta shrink-0">
                         Total: {getTotalScore(wordCombination)} points
                       </div>
                     </div>
-                    <div className="mt-1 text-sm text-indigo-600 dark:text-gray-400">
+                    <div className="tool-result-meta mt-1">
                       {wordCombination.map((word, wordIndex) => (
                         <span key={wordIndex}>
                           {word} ({calculateScore(word)} pts)
@@ -292,7 +287,7 @@ export default function MultipleWordsAnagramTool({
                     <button
                       type="button"
                       onClick={() => navigator.clipboard?.writeText(wordCombination.join(' '))}
-                      className="mt-3 rounded-md bg-white px-3 py-1 text-sm font-medium text-indigo-700 shadow-sm hover:bg-indigo-100 dark:bg-gray-800 dark:text-indigo-200 dark:hover:bg-gray-600"
+                      className="tool-secondary-button mt-3 bg-white"
                     >
                       Copy phrase
                     </button>
@@ -303,16 +298,16 @@ export default function MultipleWordsAnagramTool({
           )}
 
           {results.length === 0 && hasSearched && !loading && (
-            <div className="py-8 text-center text-gray-500 dark:text-gray-400">
+            <div className="py-8 text-center text-[#687b91]">
               <p>No multi-word anagrams found. Try a longer phrase, a lower minimum length, or the full dictionary.</p>
             </div>
           )}
 
-          <div className="mt-8 rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
-            <h4 className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          <div className="tool-note mt-8">
+            <h4 className="mb-2 text-sm font-bold text-[#061a38]">
               Tips for better results
             </h4>
-            <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+            <div className="space-y-1 text-sm text-[#52657d]">
               <div>- Use longer phrases with 8 or more letters for better combinations.</div>
               <div>- Try names, famous phrases, or puzzle clues.</div>
               <div>- Example: SCHOOLMASTER can become THE + CLASSROOM.</div>
