@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "anagram-solver-co",
+  "name": "anagram-solver-co-proxy",
   "compatibility_date": "2026-08-30",
   "routes": [
     {
