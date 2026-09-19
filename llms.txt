@@ -19,7 +19,7 @@ Anagram Solver provides specialized tools for unscrambling letters, finding exac
 
 1. **Exact Anagram Principle**: Every letter from the source input must be used exactly once. Spaces, punctuation, and capitalization are ignored.
 2. **Multi-Word Permutations**: Exhaustive recursive backtracking and pruned graph search generate full phrase solutions that cleanly divide letter counts between words.
-3. **Novel Combination Prioritization**: Phrase combinations that transpose letters across word boundaries (`✨ Transposed`) are surfaced ahead of trivial re-orderings of the original input words.
+3. **Novel Combination Prioritization**: Phrase combinations that transpose letters across word boundaries (`Transposed`) are surfaced ahead of trivial re-orderings of the original input words.
 4. **Scoring Model**: Standard English Scrabble tile values:
    - 1 pt: A, E, I, L, N, O, R, S, T, U
    - 2 pts: D, G
