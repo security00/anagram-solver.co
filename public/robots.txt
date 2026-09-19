@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+Allow: /_next/static/
 Disallow: /admin/
 Disallow: /private/
 Disallow: /api/
@@ -8,19 +9,18 @@ Disallow: /_next/
 # Preferred host and sitemap
 Sitemap: https://anagram-solver.co/sitemap.xml
 
-# Major bots
+# Major search engines
 User-agent: Googlebot
 Allow: /
+Allow: /_next/static/
 
 User-agent: Bingbot
 Allow: /
+Allow: /_next/static/
 
-# Block known aggressive crawlers
+# Block aggressive scrapers
 User-agent: MJ12bot
 Disallow: /
 
 User-agent: AhrefsBot
 Disallow: /
-
-# Politeness
-Crawl-delay: 1

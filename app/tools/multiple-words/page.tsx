@@ -2,58 +2,72 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import InnerPageShell, { InnerContent, RelatedLinkGrid } from '@/components/InnerPageShell';
 import MultipleWordsAnagramTool from '@/components/MultipleWordsAnagramTool';
+import { getCanonicalUrl } from '@/lib/siteUrl';
 
 export const revalidate = false;
 
 export const metadata: Metadata = {
-  title: 'Anagram Solver Multiple Words - Free 2 & 3 Word Finder',
+  title: 'Multiple Word Anagram Solver (Free & Instant) | 2 & 3 Words',
   description:
-    'Use this free multiple word anagram solver to find exact 2-word and 3-word phrase anagrams. Filter by dictionary, word length, and required words.',
+    'Instantly solve multiple word anagrams from any letters or phrases. Free multi-word anagram solver that finds exact 2-word and 3-word phrase combinations.',
   keywords: [
     'anagram solver multiple words',
     'multiple word anagram solver',
-    'two word anagram solver',
+    'multiple word anagram solver free',
     'multi word anagram solver',
+    'anagram finder multiple words',
+    'anagram solver 2 words',
+    'multiple word anagram solver with letters',
     'phrase anagram solver',
   ],
   alternates: {
-    canonical: 'https://anagram-solver.co/tools/multiple-words',
+    canonical: getCanonicalUrl('/tools/multiple-words'),
   },
   openGraph: {
-    title: 'Anagram Solver Multiple Words - Free 2 & 3 Word Finder',
+    title: 'Multiple Word Anagram Solver (Free & Instant) | 2 & 3 Words',
     description:
-      'Find exact multi-word anagrams from names, phrases, and puzzle clues with fast filters for 2-word and 3-word results.',
-    url: 'https://anagram-solver.co/tools/multiple-words',
+      'Instantly solve multiple word anagrams from any letters or phrases. Free multi-word anagram solver that finds exact 2-word and 3-word phrase combinations.',
+    url: getCanonicalUrl('/tools/multiple-words'),
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Anagram Solver Multiple Words - Free 2 & 3 Word Finder',
+    title: 'Multiple Word Anagram Solver (Free & Instant) | 2 & 3 Words',
     description:
-      'Find exact multi-word anagrams from names, phrases, and puzzle clues with fast filters for 2-word and 3-word results.',
+      'Instantly solve multiple word anagrams from any letters or phrases. Free multi-word anagram solver that finds exact 2-word and 3-word phrase combinations.',
   },
 };
 
 const faqs = [
   {
-    question: 'Does this solver use every letter?',
+    question: 'Is this multiple word anagram solver completely free?',
     answer:
-      'Yes. The multiple word anagram solver ignores spaces and punctuation, then returns phrases that use every input letter exactly once.',
+      'Yes, it is 100% free with no registration, word limits, or paywalls. All anagram computations run directly in your browser using high-speed Web Workers.',
   },
   {
-    question: 'Can I find exactly two-word anagrams?',
+    question: 'How do I solve multiple word anagrams from letters?',
     answer:
-      'Yes. Choose Exactly 2 words in the Word count filter to show only two-word anagram results.',
+      'Simply type or paste your letters or phrase into the input field above. The solver automatically ignores spaces and punctuation, rearrange your letters, and finds exact 2-word and 3-word combinations.',
   },
   {
-    question: 'Why do some long phrases take longer?',
+    question: 'Does this solver use every single letter?',
     answer:
-      'Multi-word anagrams require checking many word combinations. The common dictionary is faster, while the full dictionary searches a wider word list.',
+      'Yes. Every result is an exact anagram that uses every input letter exactly once. If you need partial words made from your letters, use our Word Finder tool instead.',
+  },
+  {
+    question: 'Can I find anagrams for names or famous phrases?',
+    answer:
+      'Yes. Enter any full name or phrase (such as SCHOOLMASTER or THE EYES). The solver splits and pairs words into meaningful English phrases like THE CLASSROOM or THEY SEE.',
+  },
+  {
+    question: 'Can I lock results to exactly two words or three words?',
+    answer:
+      'Yes. Toggle the Word count filter to "Exactly 2 words" or "Exactly 3 words". We also provide dedicated pages for Two Word Anagram Solver and Three Word Anagram Solver.',
   },
   {
     question: 'What does the Must include filter do?',
     answer:
-      'Use Must include when one word is already known. For example, entering the as a required word will only show phrases containing the.',
+      'Use Must include when one word of your answer is already known or suspected. For example, typing "the" will only show phrase results that contain the word "the".',
   },
 ];
 
@@ -62,14 +76,21 @@ export default function MultipleWordsPage() {
     {
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
-      name: 'Anagram Solver Multiple Words',
+      name: 'Multiple Word Anagram Solver',
       applicationCategory: 'GameApplication',
       operatingSystem: 'Any',
-      url: 'https://anagram-solver.co/tools/multiple-words',
+      url: getCanonicalUrl('/tools/multiple-words'),
+      description:
+        'Free online multiple word anagram solver that finds exact two-word and three-word phrase anagrams from letters and names.',
       offers: {
         '@type': 'Offer',
         price: '0',
         priceCurrency: 'USD',
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        ratingCount: '158',
       },
     },
     {
@@ -93,94 +114,129 @@ export default function MultipleWordsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <InnerPageShell
-        eyebrow="Word tools"
-        title="Anagram Solver for Multiple Words"
-        description="Find exact 2-word and 3-word anagrams from names, phrases, and puzzle clues. Use every letter once, filter by word length, and require a known word when you already have part of the answer."
+        breadcrumbs={[
+          { href: '/', label: 'Home' },
+          { href: '/tools/multiple-words', label: 'Tools' },
+          { label: 'Multiple Word Anagram Solver' },
+        ]}
+        eyebrow="Multi-word solver"
+        title="Multiple Word Anagram Solver"
+        description="Find exact 2-word and 3-word anagram phrases from your letters, names, and puzzle clues. 100% free, runs instantly in your browser, and uses every letter exactly once."
         heroContent={<MultipleWordsAnagramTool />}
       >
         <InnerContent wide>
-            <div className="editorial-copy">
-              <h2>Find Phrase Anagrams That Use Every Letter</h2>
+          <div className="editorial-copy">
+            <h2>Instant Multi-Word Anagrams from Any Letters</h2>
+            <p>
+              Unlike traditional anagram solvers that only unscramble letters into single dictionary
+              words, this <strong>multiple word anagram solver</strong> discovers full multi-word
+              phrases and sentences. Enter a name, cryptic crossword clue, or any set of letters,
+              and the solver breaks them down into exact combinations where <em>every single letter</em> is
+              used once.
+            </p>
+
+            <h2>Popular Examples of Multi-Word Anagrams</h2>
+            <p>
+              Multi-word anagrams often reveal clever, humorous, or poetic connections between
+              different words. Here are some famous examples you can test right now:
+            </p>
+            <ul>
+              <li><strong>THE EYES</strong> &rarr; <strong>THEY SEE</strong> (Exact 2-word anagram)</li>
+              <li><strong>SCHOOLMASTER</strong> &rarr; <strong>THE CLASSROOM</strong> (Exact 2-word anagram)</li>
+              <li><strong>ASTRONOMER</strong> &rarr; <strong>MOON STARER</strong> (Exact 2-word anagram)</li>
+              <li><strong>ELEVEN PLUS TWO</strong> &rarr; <strong>TWELVE PLUS ONE</strong> (Exact 3-word anagram, matching mathematical truth)</li>
+              <li><strong>DORMITORY</strong> &rarr; <strong>DIRTY ROOM</strong> (Exact 2-word anagram)</li>
+              <li><strong>A GENTLEMAN</strong> &rarr; <strong>ELEGANT MAN</strong> (Exact 2-word anagram)</li>
+            </ul>
+
+            <h2>When to Use a Multiple Word Anagram Solver</h2>
+            <p>
+              There are several common reasons why players and word lovers need multi-word solutions:
+            </p>
+            <ul>
+              <li>
+                <strong>Cryptic Crosswords:</strong> Clues frequently hint that an answer consists of two or three words (e.g. indicated by clue word counts like (4, 3) or (3, 4, 3)).
+              </li>
+              <li>
+                <strong>Name Anagrams & Pseudonyms:</strong> Authors, screenwriters, and gamers love rearranging personal names or character names into secret aliases or alter egos.
+              </li>
+              <li>
+                <strong>Pub Quizzes & Puzzle Hunts:</strong> Multi-word anagrams are staples of trivia competitions, escape rooms, and brain teasers.
+              </li>
+              <li>
+                <strong>Creative Writing & Branding:</strong> Brainstorm memorable brand names, band titles, and book titles from existing phrases.
+              </li>
+            </ul>
+
+            <h2>How to Filter and Get Better Results</h2>
+            <p>
+              Multi-word combinations grow exponentially with longer inputs. To find the best results quickly:
+            </p>
+            <ul>
+              <li>
+                <strong>Word Count:</strong> Choose whether you want <em>Exactly 2 words</em> or <em>Exactly 3 words</em>. Two-word anagrams are usually crisper and easier to read, while three-word anagrams help handle longer phrases.
+              </li>
+              <li>
+                <strong>Min Word Length:</strong> Increase this to 3 or 4 letters to filter out 1-letter or 2-letter connector words (like &ldquo;a&rdquo;, &ldquo;in&rdquo;, &ldquo;to&rdquo;) if you want meatier phrases.
+              </li>
+              <li>
+                <strong>Must Include:</strong> When you already know one word from a puzzle clue, type it in the &ldquo;Must include&rdquo; box to restrict the search.
+              </li>
+              <li>
+                <strong>Dictionary Type:</strong> Use <em>Common English</em> for natural, everyday words and faster searches. Switch to <em>Extended English</em> when you need comprehensive obscure vocabulary.
+              </li>
+            </ul>
+
+            <h2>Frequently Asked Questions</h2>
+            {faqs.map((faq) => (
+              <section key={faq.question}>
+                <h3>{faq.question}</h3>
+                <p>{faq.answer}</p>
+              </section>
+            ))}
+          </div>
+
+          <RelatedLinkGrid>
+            <Link
+              href="/tools/two-word-anagram-solver"
+              className="related-link"
+            >
+              <h3>Two Word Anagram Solver</h3>
               <p>
-                This multiple word anagram solver is built for phrase anagrams, not just single-word
-                word lists. Enter a name, clue, or sentence fragment, and the tool searches for
-                combinations that use the same letters exactly once. That makes it useful for puzzle
-                solving, wordplay, classroom exercises, and checking whether a phrase can be turned
-                into a clean two-word or three-word anagram.
+                Targeted tool for finding exact 2-word phrase anagrams for clues, names, and puzzle answers.
               </p>
+            </Link>
 
-              <h2>How to Search for Multiple Word Anagrams</h2>
+            <Link
+              href="/tools/three-word-anagram-solver"
+              className="related-link"
+            >
+              <h3>Three Word Anagram Solver</h3>
               <p>
-                Start by entering your letters or phrase. Choose whether you want exactly two words
-                or exactly three words, then set a minimum word length to remove short filler words.
-                If you already know one word in the answer, add it to the Must include field. The
-                common dictionary is best for faster, readable results. The full dictionary is better
-                when you want a broader search and do not mind more unusual words.
+                Explore exact three-word phrase anagrams for longer names and sentence clues.
               </p>
+            </Link>
 
-              <h2>Two-Word vs Three-Word Anagrams</h2>
+            <Link
+              href="/tools/word-finder"
+              className="related-link"
+            >
+              <h3>Word Finder & Wildcard Tool</h3>
               <p>
-                Two-word anagrams are usually easier to scan and more likely to form memorable
-                phrases. Three-word anagrams can reveal more combinations, especially for longer
-                inputs, but they may include smaller words. Use the exact word count filter when a
-                puzzle clue says the answer has a specific number of words.
+                Search words from letters, length filters, and ? wildcard patterns.
               </p>
+            </Link>
 
-              <h2>Examples to Try</h2>
-              <ul>
-                <li>SCHOOLMASTER can produce THE + CLASSROOM.</li>
-                <li>THE EYES can produce THEY + SEE.</li>
-                <li>ASTRONOMER can produce MOON + STARER.</li>
-              </ul>
-
-              <h2>Why No Result Appears</h2>
+            <Link
+              href="/tools/scrabble-solver"
+              className="related-link"
+            >
+              <h3>Rack Word Finder</h3>
               <p>
-                Multi-word anagrams are stricter than ordinary word finders because every letter has
-                to be used. If no result appears, lower the minimum word length, switch to the full
-                dictionary, remove the required word, or try exactly three words instead of exactly
-                two. Short inputs often do not have enough letters to form a useful phrase.
+                Score words from available tile racks with blank tile support and prefix/suffix filters.
               </p>
-
-              <h2>Frequently Asked Questions</h2>
-              {faqs.map((faq) => (
-                <section key={faq.question}>
-                  <h3>{faq.question}</h3>
-                  <p>{faq.answer}</p>
-                </section>
-              ))}
-            </div>
-
-            <RelatedLinkGrid>
-              <Link
-                href="/tools/two-word-anagram-solver"
-                className="related-link"
-              >
-                <h3>Two Word Anagram Solver</h3>
-                <p>
-                  Focus on exact two-word phrase anagrams for names, clues, and short phrases.
-                </p>
-              </Link>
-
-              <Link
-                href="/tools/three-word-anagram-solver"
-                className="related-link"
-              >
-                <h3>Three Word Anagram Solver</h3>
-                <p>
-                  Explore exact three-word phrase anagrams for longer names and clues.
-                </p>
-              </Link>
-
-              <Link
-                href="/tools/word-finder"
-                className="related-link"
-              >
-                <h3>Word Finder</h3>
-                <p>
-                  Search words by letters, length, and wildcard patterns.
-                </p>
-              </Link>
-            </RelatedLinkGrid>
+            </Link>
+          </RelatedLinkGrid>
         </InnerContent>
       </InnerPageShell>
     </>

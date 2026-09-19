@@ -36,7 +36,7 @@ export default function Footer() {
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8">
             <div className="flex items-center gap-3">
-              <Image src="/design/brand-mark.webp" alt="" width={36} height={36} className="h-9 w-9" />
+              <Image src="/design/brand-mark.webp" alt="Anagram Solver logo" width={36} height={36} className="h-9 w-9" />
               <span className="text-xl font-bold">Anagram Solver</span>
             </div>
             <p className="max-w-sm text-sm leading-6 text-slate-300">

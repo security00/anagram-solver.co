@@ -62,34 +62,68 @@ export default function WordFinderTool() {
         <div className="grid gap-5 md:grid-cols-2">
           <label className="tool-label tool-label-on-dark">
             Make words from letters
-            <input
-              type="text"
-              value={letters}
-              onChange={(event) => {
-                setLetters(event.target.value);
-                if (event.target.value) setPattern('');
-              }}
-              onKeyDown={(event) => event.key === 'Enter' && handleSolve()}
-              placeholder="e.g., EXAMPLE"
-              className="tool-input tool-input-on-dark"
-              maxLength={20}
-            />
+            <div className="relative mt-1">
+              <input
+                type="text"
+                value={letters}
+                onChange={(event) => {
+                  setLetters(event.target.value);
+                  if (event.target.value) setPattern('');
+                }}
+                onKeyDown={(event) => event.key === 'Enter' && handleSolve()}
+                placeholder="e.g., EXAMPLE"
+                className="tool-input tool-input-on-dark"
+                maxLength={20}
+              />
+              {letters.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLetters('');
+                    setResults([]);
+                    setTotal(0);
+                    setSearched(false);
+                  }}
+                  className="tool-clear-button"
+                  aria-label="Clear letters"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </label>
 
           <label className="tool-label tool-label-on-dark">
             Match a fixed-length pattern
-            <input
-              type="text"
-              value={pattern}
-              onChange={(event) => {
-                setPattern(event.target.value);
-                if (event.target.value) setLetters('');
-              }}
-              onKeyDown={(event) => event.key === 'Enter' && handleSolve()}
-              placeholder="e.g., C?T or ?ING"
-              className="tool-input tool-input-on-dark"
-              maxLength={20}
-            />
+            <div className="relative mt-1">
+              <input
+                type="text"
+                value={pattern}
+                onChange={(event) => {
+                  setPattern(event.target.value);
+                  if (event.target.value) setLetters('');
+                }}
+                onKeyDown={(event) => event.key === 'Enter' && handleSolve()}
+                placeholder="e.g., C?T or ?ING"
+                className="tool-input tool-input-on-dark"
+                maxLength={20}
+              />
+              {pattern.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPattern('');
+                    setResults([]);
+                    setTotal(0);
+                    setSearched(false);
+                  }}
+                  className="tool-clear-button"
+                  aria-label="Clear pattern"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
             <span className="tool-help tool-help-on-dark">Use ? for exactly one unknown letter.</span>
           </label>
         </div>
@@ -152,6 +186,23 @@ export default function WordFinderTool() {
 
           <div className="tool-note">
             Pattern examples: <code>C?T</code> finds CAT/COT/CUT; <code>?ING</code> finds RING/SING/KING.
+          </div>
+
+          {/* EEAT Trust Bar */}
+          <div className="tool-trust-bar">
+            <div className="tool-trust-items">
+              <span className="tool-trust-item">
+                <span className="tool-trust-dot" />
+                <span>Runs 100% In Browser</span>
+              </span>
+              <span className="tool-trust-item">
+                <span className="tool-trust-dot" />
+                <span>Wildcard &amp; Pattern Matching</span>
+              </span>
+            </div>
+            <span className="tool-trust-badge">
+              Updated September 2026
+            </span>
           </div>
         </div>
       </div>

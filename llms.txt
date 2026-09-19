@@ -1,0 +1,60 @@
+# Anagram Solver
+
+> Anagram Solver (https://anagram-solver.co) is a free, fast, 100% in-browser word play utility and phrase unscrambler. All computations execute locally on the user's device via client-side Web Workers, ensuring instant response times and absolute data privacy.
+
+## Overview
+
+Anagram Solver provides specialized tools for unscrambling letters, finding exact multi-word anagrams, calculating tile point scores, and discovering words through pattern and wildcard matching. Unlike traditional tools that transmit user queries over network APIs, this platform bundles verified open-source English dictionaries (SCOWL-based) and solves permutations entirely within the browser.
+
+## Core Tools & Capabilities
+
+- **Single-Word Anagram Solver** (`https://anagram-solver.co/`): Rearranges all input letters into valid single-word English anagrams using every letter exactly once. Calculates official Scrabble tile values.
+- **Multiple Word Anagram Solver** (`https://anagram-solver.co/tools/multiple-words`): Solves phrase anagrams from input letters or sentence fragments into exact 2-word and 3-word combinations. Supports dictionary toggle, required word filter, and minimum word length constraints.
+- **Two-Word Anagram Solver** (`https://anagram-solver.co/tools/two-word-anagram-solver`): Dedicated high-speed tool optimized for 2-word phrase anagrams for puzzle clues, names, and alter-egos.
+- **Three-Word Anagram Solver** (`https://anagram-solver.co/tools/three-word-anagram-solver`): Specialized finder for 3-word combinations from longer inputs (10+ letters).
+- **Word Finder & Wildcard Tool** (`https://anagram-solver.co/tools/word-finder`): Discovers subset words from letter racks and matches fixed-length patterns using `?` wildcards (e.g. `C?T` matches `CAT`, `COT`, `CUT`).
+- **Letter Rack Word Finder** (`https://anagram-solver.co/tools/scrabble-solver`): Generates valid words from available tile racks, supporting up to 2 blank tiles (`?` or `*`) and board prefix/suffix filters.
+
+## Key Solving Rules & Algorithms
+
+1. **Exact Anagram Principle**: Every letter from the source input must be used exactly once. Spaces, punctuation, and capitalization are ignored.
+2. **Multi-Word Permutations**: Exhaustive recursive backtracking and pruned graph search generate full phrase solutions that cleanly divide letter counts between words.
+3. **Novel Combination Prioritization**: Phrase combinations that transpose letters across word boundaries (`✨ Transposed`) are surfaced ahead of trivial re-orderings of the original input words.
+4. **Scoring Model**: Standard English Scrabble tile values:
+   - 1 pt: A, E, I, L, N, O, R, S, T, U
+   - 2 pts: D, G
+   - 3 pts: B, C, M, P
+   - 4 pts: F, H, V, W, Y
+   - 5 pts: K
+   - 8 pts: J, X
+   - 10 pts: Q, Z
+   - 0 pts: Blank tiles (`?`, `*`)
+
+## Verified Examples
+
+- `THE EYES` -> `THEY SEE` (Exact 2-word anagram)
+- `SCHOOLMASTER` -> `THE CLASSROOM` (Exact 2-word anagram)
+- `ASTRONOMER` -> `MOON STARER` (Exact 2-word anagram)
+- `ELEVEN PLUS TWO` -> `TWELVE PLUS ONE` (Exact 3-word anagram)
+- `DORMITORY` -> `DIRTY ROOM` (Exact 2-word anagram)
+- `A GENTLEMAN` -> `ELEGANT MAN` (Exact 2-word anagram)
+- `LISTEN` -> `SILENT`, `ENLIST`, `TINSEL`, `INLETS`, `GLINTS`
+
+## Supported Dictionaries
+
+- **Common English**: ~30,000 highly familiar words. Recommended for natural phrases, everyday wordplay, and instant speed.
+- **Extended English (Full)**: ~170,000 comprehensive English words including obscure, tournament, and scientific terms.
+
+## Privacy & Security Guarantees
+
+- **100% Client-Side**: No search queries, letters, phrases, or puzzle answers are sent to any remote server or third-party service.
+- **No Required Account**: Completely free with no login, credits, limits, or paywalls.
+- **Zero Advertising Interruptions**: Clean interface without pop-ups or full-page banner ads.
+
+## Reference Guides
+
+- Anagram Solving Tips: `https://anagram-solver.co/blog/anagram-tips`
+- Scrabble Strategy Guide: `https://anagram-solver.co/blog/scrabble-strategy`
+- Word Game Rules & Tactics: `https://anagram-solver.co/blog/word-game-guide`
+- Frequently Asked Questions: `https://anagram-solver.co/faq`
+- About the Project: `https://anagram-solver.co/about`

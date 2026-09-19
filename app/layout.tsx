@@ -1,26 +1,28 @@
 import type { Metadata } from 'next';
 import AnalyticsScripts from '@/components/AnalyticsScripts';
+import DynamicCanonical from '@/components/DynamicCanonical';
+import { getCanonicalUrl, getSiteUrl } from '@/lib/siteUrl';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Free Exact Anagram Solver and Word Finder',
-  description: 'Find exact English anagrams that use every input letter once, or use dedicated tools for rack words, patterns, and multi-word anagrams.',
+  description: 'Find exact English anagrams that use every input letter once. Unscramble letters into words, multi-word phrases, and rack combinations instantly for free.',
   keywords: ['anagram', 'anagram solver', 'word anagram', 'free anagram tool', 'anagram generator'],
-  metadataBase: new URL('https://anagram-solver.co'),
+  metadataBase: new URL(getSiteUrl()),
   openGraph: {
     title: 'Free Exact Anagram Solver and Word Finder',
-    description: 'Find exact anagrams, rack words, letter patterns, and multi-word anagrams in your browser.',
-    url: 'https://anagram-solver.co',
+    description: 'Find exact English anagrams that use every input letter once. Unscramble letters into words, multi-word phrases, and rack combinations instantly for free.',
+    url: getCanonicalUrl('/'),
     type: 'website',
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Free Exact Anagram Solver and Word Finder',
-    description: 'Find exact anagrams, rack words, letter patterns, and multi-word anagrams in your browser.',
+    description: 'Find exact English anagrams that use every input letter once. Unscramble letters into words, multi-word phrases, and rack combinations instantly for free.',
   },
   alternates: {
-    canonical: 'https://anagram-solver.co',
+    canonical: getCanonicalUrl('/'),
   },
 };
 
@@ -31,9 +33,35 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Google AdSense / Google Ads */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1548791648803369"
+          crossOrigin="anonymous"
+        />
+        {/* Google Analytics (gtag.js) */}
+        {/* eslint-disable-next-line @next/next/next-script-for-ga */}
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-5G76PLCMD6"
+        />
+        <script
+          id="google-analytics"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-5G76PLCMD6', { anonymize_ip: true });
+            `,
+          }}
+        />
+      </head>
       <body className="antialiased">
         {children}
         <AnalyticsScripts />
+        <DynamicCanonical />
       </body>
     </html>
   );

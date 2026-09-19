@@ -27,7 +27,7 @@ export default function Header() {
           <Link href="/" className="flex items-center gap-3 rounded-sm" aria-label="Anagram Solver home">
             <Image
               src="/design/brand-mark.webp"
-              alt=""
+              alt="Anagram Solver logo"
               width={38}
               height={38}
               priority

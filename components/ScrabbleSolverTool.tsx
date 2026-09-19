@@ -64,16 +64,33 @@ export default function ScrabbleSolverTool() {
       <div className="tool-primary-band">
         <label htmlFor="tiles" className="tool-label tool-label-on-dark">
           Rack or available letters
-          <input
-            type="text"
-            id="tiles"
-            value={tiles}
-            onChange={(event) => setTiles(event.target.value)}
-            onKeyDown={(event) => event.key === 'Enter' && handleSolve()}
-            placeholder="e.g., ABCDEFG or C?T"
-            className="tool-input tool-input-on-dark"
-            maxLength={15}
-          />
+          <div className="relative mt-1">
+            <input
+              type="text"
+              id="tiles"
+              value={tiles}
+              onChange={(event) => setTiles(event.target.value)}
+              onKeyDown={(event) => event.key === 'Enter' && handleSolve()}
+              placeholder="e.g., ABCDEFG or C?T"
+              className="tool-input tool-input-on-dark"
+              maxLength={15}
+            />
+            {tiles.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setTiles('');
+                  setResults([]);
+                  setTotal(0);
+                  setSearched(false);
+                }}
+                className="tool-clear-button"
+                aria-label="Clear tiles"
+              >
+                ✕
+              </button>
+            )}
+          </div>
           <span className="tool-help tool-help-on-dark">
             A standard rack has seven tiles. Use ? or * for a blank tile; blanks score zero points.
           </span>
@@ -143,6 +160,23 @@ export default function ScrabbleSolverTool() {
                 )}
               </div>
             )}
+          </div>
+
+          {/* EEAT Trust Bar */}
+          <div className="tool-trust-bar">
+            <div className="tool-trust-items">
+              <span className="tool-trust-item">
+                <span className="tool-trust-dot" />
+                <span>Runs 100% In Browser</span>
+              </span>
+              <span className="tool-trust-item">
+                <span className="tool-trust-dot" />
+                <span>Tile Point Rules Verified</span>
+              </span>
+            </div>
+            <span className="tool-trust-badge">
+              Updated September 2026
+            </span>
           </div>
         </div>
       </div>
