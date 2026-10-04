@@ -5,21 +5,21 @@ import { getCanonicalUrl, getSiteUrl } from '@/lib/siteUrl';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Free Exact Anagram Solver and Word Finder',
-  description: 'Find exact English anagrams that use every input letter once. Unscramble letters into words, multi-word phrases, and rack combinations instantly for free.',
+  title: 'Free Anagram Solver & Word Unscrambler',
+  description: 'Find exact English anagrams or shorter words from your letters. Unscramble racks, multi-word phrases, and tile combinations instantly for free.',
   keywords: ['anagram', 'anagram solver', 'word anagram', 'free anagram tool', 'anagram generator'],
   metadataBase: new URL(getSiteUrl()),
   openGraph: {
-    title: 'Free Exact Anagram Solver and Word Finder',
-    description: 'Find exact English anagrams that use every input letter once. Unscramble letters into words, multi-word phrases, and rack combinations instantly for free.',
+    title: 'Free Anagram Solver & Word Unscrambler',
+    description: 'Find exact English anagrams or shorter words from your letters. Unscramble racks, multi-word phrases, and tile combinations instantly for free.',
     url: getCanonicalUrl('/'),
     type: 'website',
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free Exact Anagram Solver and Word Finder',
-    description: 'Find exact English anagrams that use every input letter once. Unscramble letters into words, multi-word phrases, and rack combinations instantly for free.',
+    title: 'Free Anagram Solver & Word Unscrambler',
+    description: 'Find exact English anagrams or shorter words from your letters. Unscramble racks, multi-word phrases, and tile combinations instantly for free.',
   },
   alternates: {
     canonical: getCanonicalUrl('/'),

@@ -21,33 +21,34 @@ export const dynamic = 'force-static';
 export const revalidate = false;
 
 export const metadata: Metadata = {
-  title: 'Free Anagram Solver - Fast Exact Word & Phrase Finder',
-  description: 'Free online anagram solver to unscramble letters into words and multi-word phrases instantly. Fast, private client-side solver with official game points.',
+  title: 'Free Anagram Solver & Word Unscrambler',
+  description:
+    'Unscramble letters into exact anagrams or shorter words from your rack. Free in-browser anagram solver for puzzles, Scrabble racks, and multi-word phrases.',
   keywords: [
     'anagram solver',
+    'word unscrambler',
+    'words from letters',
     'anagram',
     'anagrams',
-    'word unscrambler',
     'free anagram tool',
     'anagram generator',
     'solve anagrams',
-    'word solver',
   ],
   alternates: {
     canonical: getCanonicalUrl('/'),
   },
   openGraph: {
-    title: 'Free Anagram Solver - Fast Exact Word & Phrase Finder',
+    title: 'Free Anagram Solver & Word Unscrambler',
     description:
-      'Free online anagram solver to unscramble letters into words and multi-word phrases instantly. Fast, private client-side solver with official game points.',
+      'Unscramble letters into exact anagrams or shorter words from your rack. Free in-browser anagram solver for puzzles, Scrabble racks, and multi-word phrases.',
     url: getCanonicalUrl('/'),
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free Anagram Solver - Fast Exact Word & Phrase Finder',
+    title: 'Free Anagram Solver & Word Unscrambler',
     description:
-      'Free online anagram solver to unscramble letters into words and multi-word phrases instantly. Fast, private client-side solver with official game points.',
+      'Unscramble letters into exact anagrams or shorter words from your rack. Free in-browser anagram solver for puzzles, Scrabble racks, and multi-word phrases.',
   },
 };
 
@@ -80,6 +81,11 @@ const faqItems = [
     answer:
       'Tile scores display standard base letter points modeled after popular board games (such as A=1, B=3, Z=10). This gives word game players an instant baseline score for every anagram generated.',
   },
+  {
+    question: 'What is the difference between exact anagrams and words from letters?',
+    answer:
+      'Exact anagrams use every letter once, such as LISTEN to SILENT. Words from letters finds every shorter valid word in the same rack, which is what most Scrabble and word-unscrambler searches need. Switch modes above the solver without leaving this page.',
+  },
 ];
 
 export default function HomePage() {
@@ -93,7 +99,7 @@ export default function HomePage() {
         '@type': 'SearchAction',
         target: {
           '@type': 'EntryPoint',
-          urlTemplate: `${getCanonicalUrl('/tools/multiple-words')}?q={search_term_string}`,
+          urlTemplate: `${getCanonicalUrl('/')}?q={search_term_string}`,
         },
         'query-input': 'required name=search_term_string',
       },
@@ -106,7 +112,7 @@ export default function HomePage() {
       operatingSystem: 'Any',
       url: getCanonicalUrl('/'),
       description:
-        'Free exact anagram solver and phrase finder. Solves single words, letter racks, and multiple word anagrams client-side.',
+        'Free anagram solver and word unscrambler. Finds exact anagrams, words from letters, and multiple-word phrases client-side.',
       offers: {
         '@type': 'Offer',
         price: '0',
@@ -159,15 +165,15 @@ export default function HomePage() {
           <div className="relative z-10 mx-auto max-w-[1440px] px-5 pb-0 pt-14 sm:px-8 sm:pt-16 lg:px-12 lg:pt-[70px]">
             <div className="max-w-[760px]">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-[#00aebf]/30 bg-[#e0f7fa] px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#008f9e]">
-                <SparklesIcon className="h-3.5 w-3.5" /> Fast &amp; Exact Anagram Solver
+                <SparklesIcon className="h-3.5 w-3.5" /> Fast Anagram Solver &amp; Unscrambler
               </span>
               <h1 className="mt-3 text-[2.65rem] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#061a38] sm:text-6xl lg:text-[4rem]">
-                Free Anagram Solver:{' '}
+                Free Anagram Solver &amp; Word Unscrambler:{' '}
                 <span className="block sm:inline">Find Every Word Hidden in Your Letters</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-[#52657d] sm:text-xl">
-                Our free online anagram solver unscrambles letters into exact English words and multi-word
-                anagram phrases instantly. Solve anagrams in real time with private, in-browser computation.
+                Switch between exact anagrams and words from letters in one free solver. Unscramble a rack,
+                copy a shareable result, and keep recent searches on this device.
               </p>
             </div>
 

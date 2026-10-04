@@ -5,6 +5,7 @@ from the English Speller Database (ESDB, previously SCOWLv2):
 
 - `common.txt`: size 35, 38,839 entries after normalization
 - `full.txt`: size 70, 142,056 entries after normalization
+- `names.txt`: curated given names and surnames used only when the multi-word tool's "Include common names" option is on. This overlay is not a game lexicon.
 
 Source and documentation:
 

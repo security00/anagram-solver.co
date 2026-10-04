@@ -1,6 +1,7 @@
 export type DictionaryType = 'common' | 'full';
+export type WordListType = DictionaryType | 'names';
 
-export function getDictionaryUrl(type: DictionaryType): string {
+export function getDictionaryUrl(type: WordListType): string {
   return `/dictionaries/${type}.txt`;
 }
 

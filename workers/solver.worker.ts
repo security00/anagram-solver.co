@@ -1,13 +1,19 @@
 /// <reference lib="webworker" />
 
-import { getDictionaryUrl, processWordText, type DictionaryType } from '../lib/dictionaryData';
+import {
+  getDictionaryUrl,
+  processWordText,
+  type DictionaryType,
+  type WordListType,
+} from '../lib/dictionaryData';
 import { runMultiWordSearch, runWordSearch } from '../lib/solverEngine';
 import type { SolverWorkerRequest, SolverWorkerResponse } from '../lib/solverProtocol';
 
-const dictionaryCache = new Map<DictionaryType, Set<string>>();
-const dictionaryLoads = new Map<DictionaryType, Promise<Set<string>>>();
+const dictionaryCache = new Map<WordListType, Set<string>>();
+const dictionaryLoads = new Map<WordListType, Promise<Set<string>>>();
+const mergedCache = new Map<string, Set<string>>();
 
-async function loadDictionary(type: DictionaryType): Promise<Set<string>> {
+async function loadWordList(type: WordListType): Promise<Set<string>> {
   const cached = dictionaryCache.get(type);
   if (cached) return cached;
 
@@ -27,7 +33,7 @@ async function loadDictionary(type: DictionaryType): Promise<Set<string>> {
       return dictionary;
     })
     .catch(async (error) => {
-      if (type === 'full') return loadDictionary('common');
+      if (type === 'full') return loadWordList('common');
       throw error;
     })
     .finally(() => {
@@ -38,12 +44,32 @@ async function loadDictionary(type: DictionaryType): Promise<Set<string>> {
   return loading;
 }
 
+async function loadSearchDictionary(
+  type: DictionaryType,
+  includeNames = false
+): Promise<Set<string>> {
+  if (!includeNames) return loadWordList(type);
+
+  const cacheKey = `${type}+names`;
+  const cached = mergedCache.get(cacheKey);
+  if (cached) return cached;
+
+  const [base, names] = await Promise.all([loadWordList(type), loadWordList('names')]);
+  const merged = new Set(base);
+  for (const word of names) merged.add(word);
+  mergedCache.set(cacheKey, merged);
+  return merged;
+}
+
 self.addEventListener('message', async (event: MessageEvent<SolverWorkerRequest>) => {
   const { id, query } = event.data;
 
   try {
     const startedAt = performance.now();
-    const dictionary = await loadDictionary(query.dictionaryType);
+    const dictionary =
+      query.kind === 'words'
+        ? await loadWordList(query.dictionaryType)
+        : await loadSearchDictionary(query.dictionaryType, query.includeNames);
     const outcome =
       query.kind === 'words'
         ? runWordSearch(dictionary, query.request)

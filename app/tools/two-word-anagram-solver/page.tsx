@@ -7,7 +7,7 @@ import { getCanonicalUrl } from '@/lib/siteUrl';
 export const revalidate = false;
 
 export const metadata: Metadata = {
-  title: '2 Word Anagram Solver (Free) - Exact Two Word Anagram Finder',
+  title: 'Anagram Solver 2 Words (Free) | Exact Two Word Anagram Finder',
   description:
     'Find exact two-word anagrams from letters, names, and phrases. 100% free 2 word anagram solver that uses every letter once with instant copy and filters.',
   keywords: [
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     canonical: getCanonicalUrl('/tools/two-word-anagram-solver'),
   },
   openGraph: {
-    title: '2 Word Anagram Solver (Free) - Exact Two Word Anagram Finder',
+    title: 'Anagram Solver 2 Words (Free) | Exact Two Word Anagram Finder',
     description:
       'Find exact two-word anagrams from letters, names, and phrases. 100% free 2 word anagram solver that uses every letter once with instant copy and filters.',
     url: getCanonicalUrl('/tools/two-word-anagram-solver'),
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '2 Word Anagram Solver (Free) - Exact Two Word Anagram Finder',
+    title: 'Anagram Solver 2 Words (Free) | Exact Two Word Anagram Finder',
     description:
       'Find exact two-word anagrams from letters, names, and phrases. 100% free 2 word anagram solver that uses every letter once with instant copy and filters.',
   },

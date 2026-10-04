@@ -1,4 +1,8 @@
-import type { MultiWordSearchOptions, MultiWordSearchOutcome } from './anagramSolver';
+import type {
+  MultiWordSearchOptions,
+  MultiWordSearchOutcome,
+  PhraseWordCount,
+} from './anagramSolver';
 import type { DictionaryType } from './dictionaryData';
 import type { WordSearchOutcome, WordSearchRequest } from './solverEngine';
 
@@ -10,10 +14,11 @@ export type SolverQuery =
     }
   | {
       dictionaryType: DictionaryType;
+      includeNames?: boolean;
       input: string;
       kind: 'multi';
       options: MultiWordSearchOptions;
-      wordCount: 2 | 3;
+      wordCount: PhraseWordCount;
     };
 
 export type SolverQueryOutcome = WordSearchOutcome | MultiWordSearchOutcome;

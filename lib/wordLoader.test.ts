@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { loadDictionary } from './wordLoader';
+import { loadDictionary, loadSearchDictionary, loadWordList } from './wordLoader';
 
 describe('loadDictionary', () => {
   it('loads a curated common dictionary without malformed entries', async () => {
@@ -19,5 +19,18 @@ describe('loadDictionary', () => {
 
     expect(full.size).toBeGreaterThan(common.size);
     expect(full.has('starer')).toBe(true);
+  });
+
+  it('loads a curated names overlay that can merge with common English', async () => {
+    const names = await loadWordList('names');
+    const merged = await loadSearchDictionary('common', true);
+
+    expect(names.size).toBeGreaterThan(800);
+    expect(names.has('shakespeare')).toBe(true);
+    expect(names.has('garcia')).toBe(true);
+    expect([...names].every((word) => /^[a-z]+$/.test(word))).toBe(true);
+    expect(merged.size).toBeGreaterThan(names.size);
+    expect(merged.has('classroom')).toBe(true);
+    expect(merged.has('shakespeare')).toBe(true);
   });
 });

@@ -2,14 +2,25 @@ import {
   getDictionaryUrl,
   processWordText,
   type DictionaryType,
+  type WordListType,
 } from './dictionaryData';
 
-export { getDictionaryUrl, processWordText, type DictionaryType } from './dictionaryData';
+export {
+  getDictionaryUrl,
+  processWordText,
+  type DictionaryType,
+  type WordListType,
+} from './dictionaryData';
 
-const dictionaryCache = new Map<DictionaryType, Set<string>>();
-const loadingPromises = new Map<DictionaryType, Promise<Set<string>>>();
+const dictionaryCache = new Map<WordListType, Set<string>>();
+const loadingPromises = new Map<WordListType, Promise<Set<string>>>();
+const mergedCache = new Map<string, Set<string>>();
 
 export async function loadDictionary(type: DictionaryType): Promise<Set<string>> {
+  return loadWordList(type);
+}
+
+export async function loadWordList(type: WordListType): Promise<Set<string>> {
   const cached = dictionaryCache.get(type);
   if (cached) return cached;
 
@@ -23,7 +34,7 @@ export async function loadDictionary(type: DictionaryType): Promise<Set<string>>
     })
     .catch(async (error) => {
       if (type === 'full') {
-        return loadDictionary('common');
+        return loadWordList('common');
       }
       throw error;
     })
@@ -35,7 +46,24 @@ export async function loadDictionary(type: DictionaryType): Promise<Set<string>>
   return loading;
 }
 
-async function loadDictionaryFile(type: DictionaryType): Promise<Set<string>> {
+export async function loadSearchDictionary(
+  type: DictionaryType,
+  includeNames = false
+): Promise<Set<string>> {
+  if (!includeNames) return loadWordList(type);
+
+  const cacheKey = `${type}+names`;
+  const cached = mergedCache.get(cacheKey);
+  if (cached) return cached;
+
+  const [base, names] = await Promise.all([loadWordList(type), loadWordList('names')]);
+  const merged = new Set(base);
+  for (const word of names) merged.add(word);
+  mergedCache.set(cacheKey, merged);
+  return merged;
+}
+
+async function loadDictionaryFile(type: WordListType): Promise<Set<string>> {
   let text: string;
 
   if (typeof window !== 'undefined') {
@@ -56,11 +84,12 @@ async function loadDictionaryFile(type: DictionaryType): Promise<Set<string>> {
   return processWordText(text);
 }
 
-export function getLoadedWordCount(type: DictionaryType): number {
+export function getLoadedWordCount(type: WordListType): number {
   return dictionaryCache.get(type)?.size ?? 0;
 }
 
 export function clearDictionaryCache(): void {
   dictionaryCache.clear();
   loadingPromises.clear();
+  mergedCache.clear();
 }

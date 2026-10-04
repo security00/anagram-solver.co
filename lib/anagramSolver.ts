@@ -173,13 +173,19 @@ export function findWithWildcards(
   return results;
 }
 
+export type PhraseWordCount = 2 | 3 | 4;
 export type MultiWordStopReason = 'result-limit' | 'search-budget' | 'time-limit';
+
+export function parsePhraseWords(value: string): string[] {
+  return [...new Set(value.toLowerCase().split(/[^a-z]+/).filter(Boolean))];
+}
 
 export type MultiWordSearchOptions = {
   maxResults?: number;
   minWordLength?: number;
   exactWordCount?: number;
   requiredWord?: string;
+  excludedWords?: string[];
   maxSearchStates?: number;
   timeLimitMs?: number;
 };
@@ -216,6 +222,9 @@ export function searchMultiWordAnagrams(
   const requiredWord = options?.requiredWord
     ? normalizeLetters(options.requiredWord)
     : '';
+  const excludedWords = new Set(
+    (options?.excludedWords ?? []).map((word) => normalizeLetters(word)).filter(Boolean)
+  );
 
   const letters = input.toLowerCase().replace(/[^a-z]/g, '');
   const n = letters.length;
@@ -249,6 +258,7 @@ export function searchMultiWordAnagrams(
     requiredWord &&
     (requiredWord.length < minLen ||
       requiredWord.length > n ||
+      excludedWords.has(requiredWord) ||
       !dictionary.has(requiredWord) ||
       !canSubtract(inputCnt, makeCounts(requiredWord)))
   ) {
@@ -260,6 +270,7 @@ export function searchMultiWordAnagrams(
   for (const w of dictionary) {
     const word = w.toLowerCase();
     if (word.length < minLen || word.length > n) continue;
+    if (excludedWords.has(word)) continue;
     // quick skip non a-z
     if (!/^[a-z]+$/.test(word)) continue;
     const cnt = makeCounts(word);
@@ -268,6 +279,7 @@ export function searchMultiWordAnagrams(
 
   // Sort longer words first to reduce branching and finish sooner
   candidates.sort((a, b) => b.len - a.len || (a.word < b.word ? -1 : 1));
+  const candidateLengths = new Set(candidates.map((candidate) => candidate.len));
 
   const results: string[][] = [];
   let stopReason: MultiWordStopReason | undefined;
@@ -291,6 +303,7 @@ export function searchMultiWordAnagrams(
     }
 
     const remLen = remainingLen(rem);
+    const slotsLeft = maxWords - chosen.length;
     if (remLen === 0) {
       if (
         chosen.length > 0 &&
@@ -303,7 +316,8 @@ export function searchMultiWordAnagrams(
       }
       return;
     }
-    if (chosen.length === maxWords) return;
+    if (slotsLeft <= 0 || remLen < slotsLeft * minLen) return;
+    if (slotsLeft === 1 && !candidateLengths.has(remLen)) return;
 
     for (let i = startIdx; i < candidates.length; i++) {
       if ((i & 255) === 0 && Date.now() >= deadline) {
@@ -313,6 +327,10 @@ export function searchMultiWordAnagrams(
       const c = candidates[i];
       // simple pruning: if word longer than remaining, skip
       if (c.len > remLen) continue;
+      const nextSlots = slotsLeft - 1;
+      const nextRem = remLen - c.len;
+      if (nextSlots === 0 && nextRem !== 0) continue;
+      if (nextRem < nextSlots * minLen) continue;
       if (!canSubtract(rem, c.cnt)) continue;
 
       subtractInPlace(rem, c.cnt);

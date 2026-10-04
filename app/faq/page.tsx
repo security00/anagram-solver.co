@@ -57,7 +57,7 @@ const faqCategories = [
       {
         question: 'Why might a legitimate English word occasionally be missing?',
         answer:
-          'English is vast and evolving. Brand names, proper nouns (like cities and personal names), hyphenated terms, and newly coined internet slang are excluded from standard tournament-style lexicons. If you notice a standard dictionary word missing, feel free to notify us via our Contact page.',
+          'English is vast and evolving. Brand names, hyphenated terms, and newly coined internet slang stay out of the default English lists. Personal names are off by default; turn on Include common names in the multi-word solver when you want given names and surnames. If you notice a standard dictionary word missing, feel free to notify us via our Contact page.',
       },
     ],
   },

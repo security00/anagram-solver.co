@@ -365,6 +365,42 @@ select {
   box-shadow: 0 2px 6px rgba(9, 196, 216, 0.3);
 }
 
+.solver-mode-toggle {
+  display: inline-flex;
+  padding: 0.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.solver-mode-btn {
+  border: 0;
+  background: transparent;
+  color: #c5d4e0;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  padding: 0.45rem 0.8rem;
+}
+
+.solver-mode-btn.active {
+  background: #09c4d8;
+  color: #061a38;
+}
+
+.word-hint-link {
+  display: inline-block;
+  margin-top: 0.2rem;
+  color: #007f8d;
+  font-size: 0.6875rem;
+  font-weight: 650;
+  text-decoration: underline;
+}
+
+.word-hint-link:hover {
+  color: #061a38;
+}
+
 .tool-status {
   border-left: 3px solid #9fb0c4;
   border-radius: 0 4px 4px 0;
@@ -456,6 +492,27 @@ select {
   border: 1px solid #d9e5ec;
   border-radius: 6px;
   padding: 1rem 1.15rem;
+}
+
+.tool-check-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.85rem;
+  margin-top: 0.4rem;
+  border: 1px solid #d9e5ec;
+  border-radius: 6px;
+  background: white;
+  padding: 0 0.85rem;
+  color: var(--navy);
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.tool-check-row input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #00aebf;
 }
 
 .tool-badge-novel {

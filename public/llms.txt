@@ -9,7 +9,7 @@ Anagram Solver provides specialized tools for unscrambling letters, finding exac
 ## Core Tools & Capabilities
 
 - **Single-Word Anagram Solver** (`https://anagram-solver.co/`): Rearranges all input letters into valid single-word English anagrams using every letter exactly once. Calculates official Scrabble tile values.
-- **Multiple Word Anagram Solver** (`https://anagram-solver.co/tools/multiple-words`): Solves phrase anagrams from input letters or sentence fragments into exact 2-word and 3-word combinations. Supports dictionary toggle, required word filter, and minimum word length constraints.
+- **Multiple Word Anagram Solver** (`https://anagram-solver.co/tools/multiple-words`): Solves phrase anagrams from input letters or sentence fragments into exact 2-word, 3-word, and 4-word combinations. Supports dictionary toggle, required-word and exclude filters, optional common names, and minimum word length constraints.
 - **Two-Word Anagram Solver** (`https://anagram-solver.co/tools/two-word-anagram-solver`): Dedicated high-speed tool optimized for 2-word phrase anagrams for puzzle clues, names, and alter-egos.
 - **Three-Word Anagram Solver** (`https://anagram-solver.co/tools/three-word-anagram-solver`): Specialized finder for 3-word combinations from longer inputs (10+ letters).
 - **Word Finder & Wildcard Tool** (`https://anagram-solver.co/tools/word-finder`): Discovers subset words from letter racks and matches fixed-length patterns using `?` wildcards (e.g. `C?T` matches `CAT`, `COT`, `CUT`).

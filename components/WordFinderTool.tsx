@@ -1,7 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import RecentSearches from '@/components/RecentSearches';
 import { calculateScore } from '@/lib/anagramSolver';
+import { readRecentSearches, rememberSearch } from '@/lib/searchHistory';
+import { getWordHint, getWordLookupHref } from '@/lib/wordHints';
 import { runWordSolverQuery } from '@/lib/solverClient';
 import type { DictionaryType } from '@/lib/dictionaryData';
 import type { WordSort } from '@/lib/solverEngine';
@@ -22,6 +25,11 @@ export default function WordFinderTool() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState('');
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  useEffect(() => {
+    setRecentSearches(readRecentSearches('word-finder'));
+  }, []);
 
   const handleSolve = async () => {
     if (!letters.trim() && !pattern.trim()) return;
@@ -29,6 +37,7 @@ export default function WordFinderTool() {
     setLoading(true);
     setSearched(true);
     setError('');
+    setRecentSearches(rememberSearch('word-finder', pattern.trim() || letters));
     try {
       const outcome = await runWordSolverQuery({
         dictionaryType,
@@ -149,6 +158,14 @@ export default function WordFinderTool() {
             </SelectField>
           </div>
 
+          <RecentSearches
+            items={recentSearches}
+            onPick={(query) => {
+              setLetters(query);
+              setPattern('');
+            }}
+          />
+
           <button
             onClick={handleSolve}
             disabled={(!letters.trim() && !pattern.trim()) || loading}
@@ -168,12 +185,27 @@ export default function WordFinderTool() {
                   Found {total} word{total === 1 ? '' : 's'}{total > results.length ? ` — showing the first ${results.length}` : ''}
                 </h3>
                 <div className="grid max-h-96 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
-                  {visibleResults.map((word) => (
-                    <div key={word} className="tool-result-card text-center">
-                      <span className="tool-result-word">{word.toUpperCase()}</span>
-                      <span className="tool-result-meta ml-2">{calculateScore(word)} pts</span>
-                    </div>
-                  ))}
+                  {visibleResults.map((word) => {
+                    const hint = getWordHint(word);
+                    return (
+                      <div key={word} className="tool-result-card text-center">
+                        <span className="tool-result-word">{word.toUpperCase()}</span>
+                        <span className="tool-result-meta ml-2">{calculateScore(word)} pts</span>
+                        {hint ? (
+                          <p className="mt-1 text-[11px] leading-4 text-[#687b91]">{hint}</p>
+                        ) : (
+                          <a
+                            href={getWordLookupHref(word)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="word-hint-link"
+                          >
+                            Definition
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
                 {visibleCount < results.length && (
                   <button type="button" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)} className="tool-secondary-button mt-4 w-full">

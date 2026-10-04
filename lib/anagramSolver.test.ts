@@ -6,6 +6,7 @@ import {
   findMultiWordAnagrams,
   findWithWildcards,
   findWordsFromLetters,
+  parsePhraseWords,
   searchMultiWordAnagrams,
 } from './anagramSolver';
 
@@ -103,5 +104,38 @@ describe('findMultiWordAnagrams', () => {
     expect(outcome.results).toEqual([]);
     expect(outcome.truncated).toBe(false);
     expect(outcome.visitedStates).toBe(0);
+  });
+
+  it('finds exact four-word anagrams and honors excluded words', () => {
+    const dictionary = new Set(['a', 'b', 'c', 'd', 'ab', 'cd']);
+
+    expect(
+      findMultiWordAnagrams('abcd', dictionary, 4, {
+        exactWordCount: 4,
+        minWordLength: 1,
+      })
+    ).toEqual([['a', 'b', 'c', 'd']]);
+
+    expect(
+      findMultiWordAnagrams('abcd', dictionary, 4, {
+        exactWordCount: 4,
+        excludedWords: ['a'],
+        minWordLength: 1,
+      })
+    ).toEqual([]);
+
+    expect(
+      findMultiWordAnagrams('theeyes', new Set(['they', 'see', 'the', 'eyes']), 2, {
+        exactWordCount: 2,
+        excludedWords: ['the'],
+        minWordLength: 3,
+      })
+    ).toEqual([['they', 'see']]);
+  });
+});
+
+describe('parsePhraseWords', () => {
+  it('splits exclude filters on commas and spaces', () => {
+    expect(parsePhraseWords('the, a  in')).toEqual(['the', 'a', 'in']);
   });
 });

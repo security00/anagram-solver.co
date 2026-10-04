@@ -7,7 +7,7 @@ import { getCanonicalUrl } from '@/lib/siteUrl';
 export const revalidate = false;
 
 export const metadata: Metadata = {
-  title: 'Multiple Word Anagram Solver (Free & Instant) | 2 & 3 Words',
+  title: 'Anagram Solver Multiple Words (Free) | Instant 2 & 3 Word Finder',
   description:
     'Instantly solve multiple word anagrams from any letters or phrases. Free multi-word anagram solver that finds exact 2-word and 3-word phrase combinations.',
   keywords: [
@@ -16,7 +16,6 @@ export const metadata: Metadata = {
     'multiple word anagram solver free',
     'multi word anagram solver',
     'anagram finder multiple words',
-    'anagram solver 2 words',
     'multiple word anagram solver with letters',
     'phrase anagram solver',
   ],
@@ -24,7 +23,7 @@ export const metadata: Metadata = {
     canonical: getCanonicalUrl('/tools/multiple-words'),
   },
   openGraph: {
-    title: 'Multiple Word Anagram Solver (Free & Instant) | 2 & 3 Words',
+    title: 'Anagram Solver Multiple Words (Free) | Instant 2 & 3 Word Finder',
     description:
       'Instantly solve multiple word anagrams from any letters or phrases. Free multi-word anagram solver that finds exact 2-word and 3-word phrase combinations.',
     url: getCanonicalUrl('/tools/multiple-words'),
@@ -32,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Multiple Word Anagram Solver (Free & Instant) | 2 & 3 Words',
+    title: 'Anagram Solver Multiple Words (Free) | Instant 2 & 3 Word Finder',
     description:
       'Instantly solve multiple word anagrams from any letters or phrases. Free multi-word anagram solver that finds exact 2-word and 3-word phrase combinations.',
   },
@@ -47,7 +46,7 @@ const faqs = [
   {
     question: 'How do I solve multiple word anagrams from letters?',
     answer:
-      'Simply type or paste your letters or phrase into the input field above. The solver automatically ignores spaces and punctuation, rearrange your letters, and finds exact 2-word and 3-word combinations.',
+      'Simply type or paste your letters or phrase into the input field above. The solver automatically ignores spaces and punctuation, rearrange your letters, and finds exact 2-word, 3-word, and 4-word combinations.',
   },
   {
     question: 'Does this solver use every single letter?',
@@ -57,17 +56,22 @@ const faqs = [
   {
     question: 'Can I find anagrams for names or famous phrases?',
     answer:
-      'Yes. Enter any full name or phrase (such as SCHOOLMASTER or THE EYES). The solver splits and pairs words into meaningful English phrases like THE CLASSROOM or THEY SEE.',
+      'Yes. Enter any full name or phrase (such as SCHOOLMASTER or THE EYES). Turn on Include common names when you want given names and surnames in the results. The solver splits and pairs words into meaningful English phrases like THE CLASSROOM or THEY SEE.',
   },
   {
     question: 'Can I lock results to exactly two words or three words?',
     answer:
-      'Yes. Toggle the Word count filter to "Exactly 2 words" or "Exactly 3 words". We also provide dedicated pages for Two Word Anagram Solver and Three Word Anagram Solver.',
+      'Yes. Toggle the Word count filter to exactly 2, 3, or 4 words. Dedicated pages remain available for Two Word Anagram Solver and Three Word Anagram Solver.',
   },
   {
     question: 'What does the Must include filter do?',
     answer:
       'Use Must include when one word of your answer is already known or suspected. For example, typing "the" will only show phrase results that contain the word "the".',
+  },
+  {
+    question: 'What does the Must exclude filter do?',
+    answer:
+      'Use Must exclude to drop filler or already-used words from the phrase list. You can type one word or several words separated by commas or spaces, such as "the, a".',
   },
 ];
 
@@ -201,9 +205,9 @@ export default function MultipleWordsPage() {
               href="/tools/two-word-anagram-solver"
               className="related-link"
             >
-              <h3>Two Word Anagram Solver</h3>
+              <h3>Anagram Solver 2 Words</h3>
               <p>
-                Targeted tool for finding exact 2-word phrase anagrams for clues, names, and puzzle answers.
+                Dedicated two-word anagram solver for exact phrase pairs, names, and puzzle answers.
               </p>
             </Link>
 

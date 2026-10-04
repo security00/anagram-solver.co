@@ -9,6 +9,7 @@ import {
   sortResults,
   type MultiWordSearchOptions,
   type MultiWordSearchOutcome,
+  type PhraseWordCount,
 } from './anagramSolver';
 
 export type WordSort = 'length' | 'alphabetical' | 'score';
@@ -119,7 +120,7 @@ export function runWordSearch(
 export function runMultiWordSearch(
   dictionary: Set<string>,
   input: string,
-  wordCount: 2 | 3,
+  wordCount: PhraseWordCount,
   options: MultiWordSearchOptions
 ): MultiWordSearchOutcome {
   return searchMultiWordAnagrams(input, dictionary, wordCount, {
