@@ -80,11 +80,6 @@ export default function ThreeWordAnagramSolverPage() {
         price: '0',
         priceCurrency: 'USD',
       },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: '4.8',
-        ratingCount: '94',
-      },
     },
     {
       '@context': 'https://schema.org',

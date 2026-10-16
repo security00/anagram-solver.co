@@ -91,11 +91,6 @@ export default function MultipleWordsPage() {
         price: '0',
         priceCurrency: 'USD',
       },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: '4.9',
-        ratingCount: '158',
-      },
     },
     {
       '@context': 'https://schema.org',

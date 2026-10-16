@@ -118,11 +118,6 @@ export default function HomePage() {
         price: '0',
         priceCurrency: 'USD',
       },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: '4.9',
-        ratingCount: '240',
-      },
     },
     {
       '@context': 'https://schema.org',

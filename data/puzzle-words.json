@@ -1,0 +1,35 @@
+{
+  "_doc": "Curated /anagram/<letters> pages. See doc/puzzle-pages.md. Add only queries with GSC 28-day impressions >= 100. Never invent numbers: use the exact GSC figure in gscImpressions28d, or null plus gscImpressionsNote when only a relayed range is known. Hard cap: 50 entries (enforced by lib/puzzleWords.test.ts).",
+  "entries": [
+    {
+      "letters": "soldpie",
+      "addedOn": "2026-10-17",
+      "gscWindow": "2026-09-17..2026-10-14",
+      "gscImpressions28d": null,
+      "gscImpressionsNote": "Relayed by 风雷门.行走 as one of four puzzle queries with 280-615 impressions each; exact per-query figure pending GSC export.",
+      "clicks": null,
+      "clicksCheckedOn": null,
+      "noindex": false
+    },
+    {
+      "letters": "ithrew",
+      "addedOn": "2026-10-17",
+      "gscWindow": "2026-09-17..2026-10-14",
+      "gscImpressions28d": null,
+      "gscImpressionsNote": "Relayed by 风雷门.行走 as one of four puzzle queries with 280-615 impressions each; exact per-query figure pending GSC export.",
+      "clicks": null,
+      "clicksCheckedOn": null,
+      "noindex": false
+    },
+    {
+      "letters": "loing",
+      "addedOn": "2026-10-17",
+      "gscWindow": "2026-09-17..2026-10-14",
+      "gscImpressions28d": null,
+      "gscImpressionsNote": "Query was 'loing anagram'. Relayed by 风雷门.行走 as one of four puzzle queries with 280-615 impressions each; exact per-query figure pending GSC export.",
+      "clicks": null,
+      "clicksCheckedOn": null,
+      "noindex": false
+    }
+  ]
+}

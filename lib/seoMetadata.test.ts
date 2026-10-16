@@ -9,6 +9,7 @@ const pages: Array<[string, string]> = [
   ['app/tools/scrabble-solver/page.tsx', 'scrabble solver'],
   ['app/tools/word-finder/page.tsx', 'anagram word finder'],
   ['app/tools/anagram-phrase-solver/page.tsx', 'anagram phrase solver'],
+  ['app/tools/name-anagram-solver/page.tsx', 'name anagram solver'],
 ];
 
 describe('SEO metadata', () => {
@@ -30,5 +31,14 @@ describe('SEO metadata', () => {
 
   it('phrase solver avoids unverified rating markup', () => {
     expect(src('app/tools/anagram-phrase-solver/page.tsx')).not.toContain('aggregateRating');
+  });
+});
+
+describe('structured data honesty', () => {
+  it('no page source emits aggregateRating', async () => {
+    const { globSync } = await import('node:fs');
+    const files = globSync('app/**/*.tsx');
+    expect(files.length).toBeGreaterThan(10);
+    for (const f of files) expect(src(f), f).not.toContain('aggregateRating');
   });
 });
