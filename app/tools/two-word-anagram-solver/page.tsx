@@ -80,11 +80,6 @@ export default function TwoWordAnagramSolverPage() {
         price: '0',
         priceCurrency: 'USD',
       },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: '4.9',
-        ratingCount: '112',
-      },
     },
     {
       '@context': 'https://schema.org',

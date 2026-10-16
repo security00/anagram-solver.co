@@ -13,6 +13,8 @@ Anagram Solver provides specialized tools for unscrambling letters, finding exac
 - **Two-Word Anagram Solver** (`https://anagram-solver.co/tools/two-word-anagram-solver`): Dedicated high-speed tool optimized for 2-word phrase anagrams for puzzle clues, names, and alter-egos.
 - **Three-Word Anagram Solver** (`https://anagram-solver.co/tools/three-word-anagram-solver`): Specialized finder for 3-word combinations from longer inputs (10+ letters).
 - **Anagram Phrase Solver** (`https://anagram-solver.co/tools/anagram-phrase-solver`): Turns a word, name, or phrase into multi-word anagram phrases that use every letter exactly once, with minimum-length and must-include filters.
+- **Name Anagram Solver** (`https://anagram-solver.co/tools/name-anagram-solver`): Rearranges a person's name into 2- to 4-word anagrams using every letter once, with a common-names list enabled by default.
+- **Puzzle Anagram Answers** (`https://anagram-solver.co/anagram`): Static answer pages for scrambled puzzle words (e.g. `/anagram/soldpie`), each listing exact anagrams, shorter words by length, and multi-word phrases.
 - **Word Finder & Wildcard Tool** (`https://anagram-solver.co/tools/word-finder`): Discovers subset words from letter racks and matches fixed-length patterns using `?` wildcards (e.g. `C?T` matches `CAT`, `COT`, `CUT`).
 - **Letter Rack Word Finder** (`https://anagram-solver.co/tools/scrabble-solver`): Generates valid words from available tile racks, supporting up to 2 blank tiles (`?` or `*`) and board prefix/suffix filters.
 

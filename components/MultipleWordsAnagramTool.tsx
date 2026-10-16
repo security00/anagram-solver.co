@@ -23,6 +23,7 @@ type MultipleWordsAnagramToolProps = {
   defaultWordCount?: PhraseWordCount;
   lockWordCount?: boolean;
   examples?: ExamplePhrase[];
+  defaultIncludeNames?: boolean;
 };
 
 const DEFAULT_EXAMPLES: ExamplePhrase[] = [
@@ -39,13 +40,14 @@ export default function MultipleWordsAnagramTool({
   defaultWordCount = 2,
   lockWordCount = false,
   examples = DEFAULT_EXAMPLES,
+  defaultIncludeNames = false,
 }: MultipleWordsAnagramToolProps) {
   const [input, setInput] = useState('');
   const [wordCount, setWordCount] = useState<PhraseWordCount>(defaultWordCount);
   const [minWordLength, setMinWordLength] = useState(3);
   const [containsWord, setContainsWord] = useState('');
   const [excludeWord, setExcludeWord] = useState('');
-  const [includeNames, setIncludeNames] = useState(false);
+  const [includeNames, setIncludeNames] = useState(defaultIncludeNames);
   const [resultLimit, setResultLimit] = useState(250);
   const [results, setResults] = useState<string[][]>([]);
   const [hasSearched, setHasSearched] = useState(false);
@@ -164,7 +166,8 @@ export default function MultipleWordsAnagramTool({
     const nextMin = Number(params.get('min')) || 3;
     const nextInclude = params.get('include') || '';
     const nextExclude = params.get('exclude') || '';
-    const nextNames = params.get('names') === '1';
+    const namesParam = params.get('names');
+    const nextNames = namesParam === null ? defaultIncludeNames : namesParam === '1';
     setWordCount(nextWordCount);
     if (nextMin === 2 || nextMin === 3 || nextMin === 4 || nextMin === 5) {
       setMinWordLength(nextMin);
@@ -197,7 +200,7 @@ export default function MultipleWordsAnagramTool({
     if (minWordLength !== 3) params.set('min', String(minWordLength));
     if (containsWord.trim()) params.set('include', containsWord.trim());
     if (excludeWord.trim()) params.set('exclude', excludeWord.trim());
-    if (includeNames) params.set('names', '1');
+    if (includeNames !== defaultIncludeNames) params.set('names', includeNames ? '1' : '0');
     const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
     void navigator.clipboard.writeText(url);
     setCopiedShare(true);

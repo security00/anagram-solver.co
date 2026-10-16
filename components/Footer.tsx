@@ -12,6 +12,8 @@ export default function Footer() {
       { name: 'Multiple Word Anagrams', href: '/tools/multiple-words' },
       { name: 'Two Word Anagram Solver', href: '/tools/two-word-anagram-solver' },
       { name: 'Anagram Phrase Solver', href: '/tools/anagram-phrase-solver' },
+      { name: 'Name Anagram Solver', href: '/tools/name-anagram-solver' },
+      { name: 'Puzzle Anagrams', href: '/anagram' },
       { name: 'Three Word Anagram Solver', href: '/tools/three-word-anagram-solver' },
     ],
     company: [

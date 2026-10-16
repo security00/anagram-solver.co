@@ -171,7 +171,7 @@ export default function WordFinderPage() {
           <ul>
             <li><strong>Word games and Wordle:</strong> use this word finder with length filters or a <code>?</code> pattern.</li>
             <li><strong>Exact one-word anagrams:</strong> the <Link href="/">anagram solver</Link> shows only full-letter matches.</li>
-            <li><strong>Phrases and names:</strong> the <Link href="/tools/anagram-phrase-solver">anagram phrase solver</Link> splits letters into two or three words.</li>
+            <li><strong>Phrases and names:</strong> the <Link href="/tools/anagram-phrase-solver">anagram phrase solver</Link> splits letters into two or three words, and the <Link href="/tools/name-anagram-solver">name anagram solver</Link> does the same for names.</li>
             <li><strong>Scrabble racks with blanks:</strong> the <Link href="/tools/scrabble-solver">Scrabble solver</Link> adds tile points and board hooks.</li>
           </ul>
 
