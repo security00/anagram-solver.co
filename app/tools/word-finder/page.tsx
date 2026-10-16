@@ -8,11 +8,14 @@ export const dynamic = 'force-static';
 export const revalidate = false;
 
 export const metadata: Metadata = {
-  title: 'Word Finder from Letters & Wildcard Patterns (Free)',
+  title: 'Anagram Word Finder: Find Words From Letters (Free)',
   description:
-    'Find English words that can be built from available letters or match fixed-length patterns with ? wildcards. Fast, free in-browser solver with length filters.',
+    'Free anagram word finder: enter letters to find every word they make, from 2 letters to full anagrams, or search ? wildcard patterns. Filter by length.',
   keywords: [
     'word finder',
+    'anagram finder',
+    'anagram word finder',
+    'word finder anagram',
     'word finder from letters',
     'word unscrambler',
     'wildcard word finder',
@@ -23,21 +26,26 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: getCanonicalUrl('/tools/word-finder') },
   openGraph: {
-    title: 'Word Finder from Letters & Wildcard Patterns (Free)',
+    title: 'Anagram Word Finder: Find Words From Letters (Free)',
     description:
-      'Find English words that can be built from available letters or match fixed-length patterns with ? wildcards. Fast, free in-browser solver with length filters.',
+      'Free anagram word finder: enter letters to find every word they make, from 2 letters to full anagrams, or search ? wildcard patterns. Filter by length.',
     url: getCanonicalUrl('/tools/word-finder'),
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Word Finder from Letters & Wildcard Patterns (Free)',
+    title: 'Anagram Word Finder: Find Words From Letters (Free)',
     description:
-      'Find English words that can be built from available letters or match fixed-length patterns with ? wildcards. Fast, free in-browser solver with length filters.',
+      'Free anagram word finder: enter letters to find every word they make, from 2 letters to full anagrams, or search ? wildcard patterns. Filter by length.',
   },
 };
 
 const faqs = [
+  {
+    question: 'Is this an anagram finder?',
+    answer:
+      'Yes. Enter your letters and sort by length: results at the top that use every letter are exact anagrams, and everything below them is a shorter word hidden in the same letters. For anagrams only, use the exact anagram solver on the home page.',
+  },
   {
     question: 'What is the difference between an anagram solver and a word finder?',
     answer:
@@ -120,8 +128,8 @@ export default function WordFinderPage() {
   return (
     <InnerPageShell
       eyebrow="Word tools"
-      title="Word Finder"
-      description="Build words from available letters or search an exact-length pattern with unknown positions."
+      title="Anagram Word Finder"
+      description="Find every word you can make from your letters, from short words up to full anagrams, or search a pattern with unknown letters."
       heroContent={<WordFinderTool />}
     >
       <InnerContent wide>
@@ -151,6 +159,22 @@ export default function WordFinderPage() {
         </div>
 
         <div className="editorial-copy mt-8">
+          <h2>Anagram Finder and Word Finder in One</h2>
+          <p>
+            An anagram finder answers &ldquo;what words use all of these letters?&rdquo;, while a word finder answers
+            &ldquo;what words can I make from these letters?&rdquo;. This page does both. For example, the letters
+            <em> RACE</em> give the anagrams <em>ACRE</em> and <em>CARE</em>, plus shorter words such as <em>ARC</em>,
+            <em> CAR</em> and <em>ERA</em>. Sort by length and the full anagrams appear first.
+          </p>
+
+          <h2>When to Use Each Tool</h2>
+          <ul>
+            <li><strong>Word games and Wordle:</strong> use this word finder with length filters or a <code>?</code> pattern.</li>
+            <li><strong>Exact one-word anagrams:</strong> the <Link href="/">anagram solver</Link> shows only full-letter matches.</li>
+            <li><strong>Phrases and names:</strong> the <Link href="/tools/anagram-phrase-solver">anagram phrase solver</Link> splits letters into two or three words.</li>
+            <li><strong>Scrabble racks with blanks:</strong> the <Link href="/tools/scrabble-solver">Scrabble solver</Link> adds tile points and board hooks.</li>
+          </ul>
+
           <h2>Frequently Asked Questions</h2>
           {faqs.map((faq) => (
             <section key={faq.question} className="mt-4">

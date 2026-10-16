@@ -1,0 +1,7 @@
+{
+  "name": "anagram-solver-co-www-redirect",
+  "main": "index.ts",
+  "compatibility_date": "2026-08-30",
+  "routes": [{ "pattern": "www.anagram-solver.co/*", "zone_name": "anagram-solver.co" }],
+  "workers_dev": false
+}
