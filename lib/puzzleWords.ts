@@ -16,6 +16,11 @@ export type PuzzleEntry = {
   gscWindow: string;
   gscImpressions28d: number | null;
   gscImpressionsNote?: string;
+  gscQuery?: string;
+  gscSource?: string;
+  gscClicks28d?: number;
+  gscPosition28d?: number;
+  gscPrevImpressions28d?: number | null;
   clicks: number | null;
   clicksCheckedOn: string | null;
   noindex: boolean;

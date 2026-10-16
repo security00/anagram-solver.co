@@ -9,7 +9,7 @@ export const revalidate = false;
 
 const title = 'Puzzle Anagrams: Answers to Scrambled Words';
 const description =
-  'Answers for scrambled puzzle words people search for, such as SOLDPIE, ITHREW and LOING, with every anagram, shorter word and phrase from the letters.';
+  'Answers for scrambled puzzle words people search for, such as SOLDPIE, ITHREW, TAICELD and GRAMLEET, with every anagram, shorter word and phrase from the letters.';
 
 export const metadata: Metadata = {
   title,
