@@ -12,6 +12,7 @@ const innerPages = [
   'app/blog/scrabble-strategy/page.tsx',
   'app/blog/word-game-guide/page.tsx',
   'app/tools/multiple-words/page.tsx',
+  'app/tools/anagram-phrase-solver/page.tsx',
   'app/tools/scrabble-solver/page.tsx',
   'app/tools/three-word-anagram-solver/page.tsx',
   'app/tools/two-word-anagram-solver/page.tsx',

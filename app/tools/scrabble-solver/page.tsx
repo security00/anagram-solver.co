@@ -8,9 +8,9 @@ export const dynamic = 'force-static';
 export const revalidate = false;
 
 export const metadata: Metadata = {
-  title: 'Scrabble Word Finder & Letter Rack Solver (With Points)',
+  title: 'Scrabble Solver & Scrabble Anagram Finder (With Points)',
   description:
-    'Find high-scoring English words from your letter rack. Supports blank tiles (?/*), board prefixes/suffixes, and instant tile score calculations 100% in your browser.',
+    'Free Scrabble solver: enter your rack, add blanks with ? or *, and get every playable word and Scrabble anagram sorted by points. Board hooks supported.',
   keywords: [
     'scrabble solver',
     'scrabble word finder',
@@ -23,21 +23,36 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: getCanonicalUrl('/tools/scrabble-solver') },
   openGraph: {
-    title: 'Scrabble Word Finder & Letter Rack Solver (With Points)',
+    title: 'Scrabble Solver & Scrabble Anagram Finder (With Points)',
     description:
-      'Find high-scoring English words from your letter rack. Supports blank tiles (?/*), board prefixes/suffixes, and instant tile score calculations 100% in your browser.',
+      'Free Scrabble solver: enter your rack, add blanks with ? or *, and get every playable word and Scrabble anagram sorted by points. Board hooks supported.',
     url: getCanonicalUrl('/tools/scrabble-solver'),
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Scrabble Word Finder & Letter Rack Solver (With Points)',
+    title: 'Scrabble Solver & Scrabble Anagram Finder (With Points)',
     description:
-      'Find high-scoring English words from your letter rack. Supports blank tiles (?/*), board prefixes/suffixes, and instant tile score calculations 100% in your browser.',
+      'Free Scrabble solver: enter your rack, add blanks with ? or *, and get every playable word and Scrabble anagram sorted by points. Board hooks supported.',
   },
 };
 
 const faqs = [
+  {
+    question: 'What is a Scrabble anagram solver?',
+    answer:
+      'A Scrabble anagram solver unscrambles the tiles on your rack into every valid word you could play. It shows full-rack anagrams (all seven tiles, the 50-point bingo) as well as every shorter word, so you can compare options by points before you place a tile.',
+  },
+  {
+    question: 'How do I find a bingo (a word that uses all 7 tiles)?',
+    answer:
+      'Type all seven rack letters and look at the longest results first. Any 7-letter result is a full-rack anagram. If none appear, add one board letter in the Prefix or Suffix box to look for 8-letter plays through an open tile.',
+  },
+  {
+    question: 'Which word list does the Scrabble solver use?',
+    answer:
+      'Results come from open SCOWL / English Speller Database word lists. They are not the official tournament lists (NWL or Collins), so check a word against your game or club dictionary before challenging.',
+  },
   {
     question: 'How do I use blank tiles in this Scrabble solver?',
     answer:
@@ -120,8 +135,8 @@ export default function ScrabbleSolverPage() {
   return (
     <InnerPageShell
       eyebrow="Word tools"
-      title="Letter Rack Word Finder"
-      description="Find words that can be made from a rack, including blank tiles, and compare their base English tile values."
+      title="Scrabble Solver &amp; Anagram Finder"
+      description="Unscramble your Scrabble rack into every playable word, including blanks, with base tile points for each result."
       heroContent={<ScrabbleSolverTool />}
     >
       <InnerContent wide>
@@ -150,6 +165,30 @@ export default function ScrabbleSolverPage() {
         </div>
 
         <div className="editorial-copy mt-8">
+          <h2>How to Use the Scrabble Solver</h2>
+          <ol>
+            <li><strong>Enter your rack.</strong> Type up to the seven tiles you hold, for example <code>AEIRSTN</code>.</li>
+            <li><strong>Add blanks.</strong> Type <code>?</code> or <code>*</code> for each blank tile. Blanks score zero.</li>
+            <li><strong>Hook onto the board.</strong> Put letters already on the board in the Prefix or Suffix box.</li>
+            <li><strong>Pick the best play.</strong> Results show the base tile points, so compare the top words, then apply board premiums yourself.</li>
+          </ol>
+
+          <h2>Scrabble Anagrams vs. Shorter Words</h2>
+          <p>
+            A Scrabble anagram uses every tile on your rack, such as <em>AEIRSTN</em> becoming <em>RETAINS</em> or
+            <em> NASTIER</em>. Those full-rack plays earn the 50-point bingo bonus, so check them first. When no
+            full-rack anagram exists, shorter words that keep a balanced leave (a good mix of vowels and consonants,
+            plus useful tiles like S and blanks) usually beat the single highest-scoring word.
+          </p>
+
+          <h2>Quick Rack Tips</h2>
+          <ul>
+            <li>Learn the two-letter words: they let you score in two directions at once.</li>
+            <li>Hold on to an S or a blank when you can; they turn many plays into bingos.</li>
+            <li>Dump duplicate letters and awkward tiles (two Us, a lone Q) instead of chasing a few extra points.</li>
+            <li>Use the <Link href="/">exact anagram solver</Link> to see only words that use every letter.</li>
+          </ul>
+
           <h2>Frequently Asked Questions</h2>
           {faqs.map((faq) => (
             <section key={faq.question} className="mt-4">
