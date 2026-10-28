@@ -682,7 +682,7 @@ export default function MultipleWordsAnagramTool({
               </span>
               <span className="tool-trust-item">
                 <span className="tool-trust-dot" />
-                <span>Free &amp; Ad-Free Experience</span>
+                <span>Scrabble-style letter points · Unofficial word list</span>
               </span>
             </div>
             <span className="tool-trust-badge">

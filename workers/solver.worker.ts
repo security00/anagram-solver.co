@@ -7,13 +7,56 @@ import {
   type WordListType,
 } from '../lib/dictionaryData';
 import { runMultiWordSearch, runWordSearch } from '../lib/solverEngine';
-import type { SolverWorkerRequest, SolverWorkerResponse } from '../lib/solverProtocol';
+import type { SolverProgressMessage, SolverWorkerRequest, SolverWorkerResponse } from '../lib/solverProtocol';
 
 const dictionaryCache = new Map<WordListType, Set<string>>();
 const dictionaryLoads = new Map<WordListType, Promise<Set<string>>>();
 const mergedCache = new Map<string, Set<string>>();
 
-async function loadWordList(type: WordListType): Promise<Set<string>> {
+const APPROX_BYTES: Record<WordListType, number> = {
+  common: 345_000,
+  full: 1_400_000,
+  names: 32_000,
+};
+
+async function readDictionaryText(
+  response: Response,
+  type: WordListType,
+  onProgress?: (loaded: number, total: number) => void,
+): Promise<string> {
+  const headerTotal = Number(response.headers.get('content-length'));
+  const total = Number.isFinite(headerTotal) && headerTotal > 0 ? headerTotal : APPROX_BYTES[type];
+  if (!response.body) {
+    const text = await response.text();
+    onProgress?.(new TextEncoder().encode(text).byteLength, total);
+    return text;
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let loaded = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (!value) continue;
+    chunks.push(value);
+    loaded += value.byteLength;
+    onProgress?.(loaded, total);
+  }
+
+  const merged = new Uint8Array(loaded);
+  let offset = 0;
+  for (const chunk of chunks) {
+    merged.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(merged);
+}
+
+async function loadWordList(
+  type: WordListType,
+  onProgress?: (loaded: number, total: number) => void,
+): Promise<Set<string>> {
   const cached = dictionaryCache.get(type);
   if (cached) return cached;
 
@@ -26,7 +69,7 @@ async function loadWordList(type: WordListType): Promise<Set<string>> {
       if (!response.ok) {
         throw new Error(`Failed to load ${type} dictionary (${response.status}).`);
       }
-      return processWordText(await response.text());
+      return processWordText(await readDictionaryText(response, type, onProgress));
     })
     .then((dictionary) => {
       dictionaryCache.set(type, dictionary);
@@ -66,10 +109,30 @@ self.addEventListener('message', async (event: MessageEvent<SolverWorkerRequest>
 
   try {
     const startedAt = performance.now();
+    const report = (loaded: number, total: number) => {
+      const progress: SolverProgressMessage = {
+        dictionaryType: query.dictionaryType,
+        id,
+        kind: 'progress',
+        loadedBytes: loaded,
+        phase: 'loading',
+        totalBytes: total,
+      };
+      self.postMessage(progress);
+    };
     const dictionary =
       query.kind === 'words'
-        ? await loadWordList(query.dictionaryType)
+        ? await loadWordList(query.dictionaryType, report)
         : await loadSearchDictionary(query.dictionaryType, query.includeNames);
+    const searching: SolverProgressMessage = {
+      dictionaryType: query.dictionaryType,
+      id,
+      kind: 'progress',
+      loadedBytes: 0,
+      phase: 'searching',
+      totalBytes: null,
+    };
+    self.postMessage(searching);
     const outcome =
       query.kind === 'words'
         ? runWordSearch(dictionary, query.request)

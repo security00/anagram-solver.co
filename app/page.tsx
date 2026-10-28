@@ -12,6 +12,7 @@ import {
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import AdSlot from '@/components/AdSlot';
 import AnagramSolverTool from '@/components/AnagramSolverTool';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
@@ -67,19 +68,19 @@ const faqItems = [
       'Yes! In addition to single-word anagrams, our specialized multiple-word anagram solver splits all input letters across two or three separate words. This is ideal for solving cryptic crossword clues, phrase puzzles, and creative name anagrams.',
   },
   {
-    question: 'Is my input private when using this anagram solver?',
+    question: 'Is my search sent to a server?',
     answer:
-      'Completely private. Our anagram solver runs 100% inside your browser using client-side Web Workers. Your letters, words, and anagram search queries are never transmitted to, inspected by, or stored on any remote server.',
+      'Solving runs in your browser with a Web Worker. Ads and analytics load only under your cookie choice where applicable.',
   },
   {
-    question: 'Which dictionaries does the anagram solver support?',
+    question: 'How big is the dictionary?',
     answer:
-      'Our anagram solver provides two curated lexicons: the Common Dictionary (around 40,000 everyday words for standard puzzles and board games) and the Extended Dictionary (over 178,000 words for competitive tournament play and deep anagram research).',
+      'Common mode uses about 39,000 everyday words for speed. Extended mode uses about 142,000 words. Counts can shift slightly when we refresh the lists.',
   },
   {
-    question: 'How are tile scores calculated in the anagram solver?',
+    question: 'Are these official Scrabble words?',
     answer:
-      'Tile scores display standard base letter points modeled after popular board games (such as A=1, B=3, Z=10). This gives word game players an instant baseline score for every anagram generated.',
+      'No. We show Scrabble-style letter points so you can sort by score, but our word lists are not an official Scrabble® dictionary or tournament word list. Always check your game’s rulebook or official list for tournament play.',
   },
   {
     question: 'What is the difference between exact anagrams and words from letters?',
@@ -174,11 +175,15 @@ export default function HomePage() {
             </div>
 
             <AnagramSolverTool />
+            <AdSlot note slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BELOW_TOOL} />
           </div>
         </section>
 
         {/* Section: What is an Anagram */}
         <section className="bg-white py-14 sm:py-16" aria-labelledby="anagram-explainer-title">
+          <div className="mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-12">
+            <AdSlot slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BEFORE_COPY} />
+          </div>
           <div className="mx-auto grid max-w-[1320px] gap-12 px-5 sm:px-8 lg:grid-cols-[1fr_1fr] lg:items-center lg:px-12">
             <div>
               <span className="text-xs font-extrabold uppercase tracking-widest text-[#00aebf]">
@@ -312,10 +317,9 @@ export default function HomePage() {
 
               <div className="rounded-xl border border-[#d9e5ec] p-6 transition-shadow hover:shadow-md">
                 <CheckBadgeIcon className="h-8 w-8 text-[#00aebf]" aria-hidden="true" />
-                <h3 className="mt-4 text-base font-bold text-[#061a38]">Official Tile Scoring</h3>
+                <h3 className="mt-4 text-base font-bold text-[#061a38]">Scrabble-style letter points</h3>
                 <p className="mt-2 text-sm leading-relaxed text-[#52657d]">
-                  Every solved word displays authentic letter tile scores, helping you evaluate high-scoring
-                  anagrams for competitive word games.
+                  Points follow common Scrabble letter values for sorting. This is not an official Scrabble® dictionary or tournament word list.
                 </p>
               </div>
 
@@ -351,7 +355,10 @@ export default function HomePage() {
                     <PuzzlePieceIcon className="mt-0.5 h-5 w-5 shrink-0 text-[#008f9e]" />
                     <span>
                       <strong className="text-[#061a38]">Scrabble &amp; Words with Friends:</strong> Discover
-                      bingo candidates and unscramble complex 7-letter racks into high-scoring words.
+                      bingo candidates and unscramble complex 7-letter racks into high-scoring words. Use the{' '}
+                      <Link href="/tools/scrabble-solver" className="font-semibold text-[#008f9e] underline">Scrabble solver</Link>{' '}
+                      or the{' '}
+                      <Link href="/tools/words-with-friends-finder" className="font-semibold text-[#008f9e] underline">Words With Friends finder</Link>.
                     </span>
                   </li>
                   <li className="flex items-start gap-3">
@@ -359,14 +366,17 @@ export default function HomePage() {
                     <span>
                       <strong className="text-[#061a38]">Cryptic Crosswords &amp; Jumble:</strong> Decode
                       cryptic anagram clues where words like &ldquo;confused&rdquo; or &ldquo;rebuilt&rdquo; signal
-                      scrambled letters.
+                      scrambled letters. Unscramble one word at a time with the{' '}
+                      <Link href="/tools/jumble-solver" className="font-semibold text-[#008f9e] underline">jumble solver</Link>.
                     </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <PuzzlePieceIcon className="mt-0.5 h-5 w-5 shrink-0 text-[#008f9e]" />
                     <span>
                       <strong className="text-[#061a38]">Wordle &amp; Spelling Bee:</strong> Check letter
-                      permutations and uncover unexpected anagram solutions to master daily challenges.
+                      permutations and uncover unexpected anagram solutions to master daily challenges. For a 5-letter unscramble, open the{' '}
+                      <Link href="/tools/word-finder?min=5&max=5" className="font-semibold text-[#008f9e] underline">word finder with length 5</Link>.
+                      That is not a green, yellow, or gray solver.
                     </span>
                   </li>
                   <li className="flex items-start gap-3">

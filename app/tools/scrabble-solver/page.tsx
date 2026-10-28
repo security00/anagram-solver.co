@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import InnerPageShell, { InnerContent, RelatedLinkGrid } from '@/components/InnerPageShell';
 import ScrabbleSolverTool from '@/components/ScrabbleSolverTool';
+import ToolCrossPromo from '@/components/ToolCrossPromo';
 import { getCanonicalUrl } from '@/lib/siteUrl';
 
 export const dynamic = 'force-static';
@@ -51,12 +52,12 @@ const faqs = [
   {
     question: 'Which word list does the Scrabble solver use?',
     answer:
-      'Results come from open SCOWL / English Speller Database word lists. They are not the official tournament lists (NWL or Collins), so check a word against your game or club dictionary before challenging.',
+      'Results come from open English word lists (Common about 39,000, Extended about 142,000). Points follow common Scrabble letter values for sorting. This is not an official Scrabble® dictionary or tournament word list.',
   },
   {
     question: 'How do I use blank tiles in this Scrabble solver?',
     answer:
-      'Enter a question mark (?) or asterisk (*) into your rack for each blank tile you hold. The solver will automatically test all 26 English letters in that position and assign 0 points to the wild tile in accordance with official Scrabble rules.',
+      'Enter a question mark (?) or asterisk (*) into your rack for each blank tile you hold. The solver tries letters in that position. Blanks contribute 0 face points. Points follow common Scrabble letter values for sorting. This is not an official Scrabble® dictionary or tournament word list.',
   },
   {
     question: 'How do Prefix and Suffix filters help on a game board?',
@@ -198,6 +199,7 @@ export default function ScrabbleSolverPage() {
           ))}
         </div>
 
+        <ToolCrossPromo hint="Need WWF-style points or a jumble instead?" />
         <RelatedLinkGrid>
           <Link href="/" className="related-link">
             <h3>Exact Anagram Solver</h3>

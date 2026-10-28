@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import InnerPageShell, { InnerContent, RelatedLinkGrid } from '@/components/InnerPageShell';
+import ToolCrossPromo from '@/components/ToolCrossPromo';
 import WordFinderTool from '@/components/WordFinderTool';
 import { getCanonicalUrl } from '@/lib/siteUrl';
 
@@ -169,7 +170,11 @@ export default function WordFinderPage() {
 
           <h2>When to Use Each Tool</h2>
           <ul>
-            <li><strong>Word games and Wordle:</strong> use this word finder with length filters or a <code>?</code> pattern.</li>
+            <li>
+              <strong>Word games and 5-letter unscrambling:</strong> set length to 5, or open{' '}
+              <Link href="/tools/word-finder?min=5&max=5">word finder with min and max at 5</Link>.
+              This is not a green, yellow, or gray Wordle solver.
+            </li>
             <li><strong>Exact one-word anagrams:</strong> the <Link href="/">anagram solver</Link> shows only full-letter matches.</li>
             <li><strong>Phrases and names:</strong> the <Link href="/tools/anagram-phrase-solver">anagram phrase solver</Link> splits letters into two or three words, and the <Link href="/tools/name-anagram-solver">name anagram solver</Link> does the same for names.</li>
             <li><strong>Scrabble racks with blanks:</strong> the <Link href="/tools/scrabble-solver">Scrabble solver</Link> adds tile points and board hooks.</li>
@@ -184,6 +189,7 @@ export default function WordFinderPage() {
           ))}
         </div>
 
+        <ToolCrossPromo hint="Five-letter racks, blanks, and jumble words live on these tools:" />
         <RelatedLinkGrid>
           <Link href="/" className="related-link">
             <h3>Exact Anagram Solver</h3>

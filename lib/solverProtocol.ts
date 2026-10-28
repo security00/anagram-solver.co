@@ -3,7 +3,7 @@ import type {
   MultiWordSearchOutcome,
   PhraseWordCount,
 } from './anagramSolver';
-import type { DictionaryType } from './dictionaryData';
+import type { DictionaryType, WordListType } from './dictionaryData';
 import type { WordSearchOutcome, WordSearchRequest } from './solverEngine';
 
 export type SolverQuery =
@@ -41,3 +41,12 @@ export type SolverWorkerResponse =
       id: number;
       ok: false;
     };
+
+export type SolverProgressMessage = {
+  kind: 'progress';
+  id: number;
+  phase: 'loading' | 'searching';
+  dictionaryType: WordListType;
+  loadedBytes: number;
+  totalBytes: number | null;
+};

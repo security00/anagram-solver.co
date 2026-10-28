@@ -3,20 +3,21 @@
  * Core algorithms for finding anagrams from given letters
  */
 
-// Find exact anagrams: every normalized input letter must be used once.
+// Find exact anagrams: every letter and every blank must be used once.
 export function findAnagrams(input: string, dictionary: Set<string>): string[] {
   const normalizedInput = normalizeLetters(input);
+  const wildcardCount = countWildcards(input);
   const inputFreq = getCharFrequency(normalizedInput);
+  const targetLength = normalizedInput.length + wildcardCount;
   const results: string[] = [];
 
   for (const word of dictionary) {
     const normalizedWord = normalizeLetters(word);
-    if (
-      normalizedWord.length === normalizedInput.length &&
-      canFormWord(inputFreq, normalizedWord)
-    ) {
-      results.push(word);
-    }
+    if (normalizedWord.length !== targetLength) continue;
+    const matches = wildcardCount
+      ? canFormWordWithWildcards(inputFreq, normalizedWord, wildcardCount)
+      : canFormWord(inputFreq, normalizedWord);
+    if (matches) results.push(word);
   }
 
   return results;
@@ -101,7 +102,7 @@ function canFormWord(inputFreq: Map<string, number>, word: string): boolean {
 // Sort results by multiple criteria
 export function sortResults(
   words: string[],
-  sortBy: 'length' | 'alphabetical' | 'score' = 'length'
+  sortBy: 'length' | 'alphabetical' | 'score' | 'wwf' = 'length'
 ): string[] {
   const sorted = [...words];
 
@@ -111,7 +112,11 @@ export function sortResults(
     case 'alphabetical':
       return sorted.sort();
     case 'score':
-      return sorted.sort((a, b) => calculateScore(b) - calculateScore(a));
+      return sorted.sort((a, b) => calculateScore(b) - calculateScore(a) || a.localeCompare(b));
+    case 'wwf':
+      return sorted.sort(
+        (a, b) => calculateWwfStyleScore(b) - calculateWwfStyleScore(a) || a.localeCompare(b),
+      );
     default:
       return sorted;
   }
@@ -123,16 +128,20 @@ const LETTER_SCORES: Record<string, number> = {
   y: 4, z: 10,
 };
 
-// Calculate a Scrabble-style face-value score without board multipliers.
-export function calculateScore(word: string): number {
-  return word
-    .toLowerCase()
+// Commonly published Words With Friends face values. Used only for sorting.
+const WWF_STYLE_SCORES: Record<string, number> = {
+  a: 1, b: 4, c: 4, d: 2, e: 1, f: 4, g: 3, h: 3, i: 1, j: 10, k: 5, l: 2,
+  m: 4, n: 2, o: 1, p: 4, q: 10, r: 1, s: 1, t: 1, u: 2, v: 5, w: 4, x: 8,
+  y: 3, z: 10,
+};
+
+function sumFaceScore(word: string, table: Record<string, number>): number {
+  return normalizeLetters(word)
     .split('')
-    .reduce((sum, char) => sum + (LETTER_SCORES[char] || 0), 0);
+    .reduce((sum, char) => sum + (table[char] || 0), 0);
 }
 
-// Score a word against a rack, where letters represented by blank tiles score zero.
-export function calculateRackScore(word: string, rack: string): number {
+function scoreRack(word: string, rack: string, table: Record<string, number>): number {
   const available = getCharFrequency(normalizeLetters(rack));
   let blanks = [...rack].filter((character) => character === '?' || character === '*').length;
   let score = 0;
@@ -141,13 +150,32 @@ export function calculateRackScore(word: string, rack: string): number {
     const count = available.get(character) || 0;
     if (count > 0) {
       available.set(character, count - 1);
-      score += LETTER_SCORES[character] || 0;
+      score += table[character] || 0;
     } else if (blanks > 0) {
       blanks--;
     }
   }
 
   return score;
+}
+
+// Calculate a Scrabble-style face-value score without board multipliers.
+export function calculateScore(word: string): number {
+  return sumFaceScore(word, LETTER_SCORES);
+}
+
+// Words With Friends–style face values, without board multipliers.
+export function calculateWwfStyleScore(word: string): number {
+  return sumFaceScore(word, WWF_STYLE_SCORES);
+}
+
+// Score a word against a rack, where letters represented by blank tiles score zero.
+export function calculateRackScore(word: string, rack: string): number {
+  return scoreRack(word, rack, LETTER_SCORES);
+}
+
+export function calculateWwfStyleRackScore(word: string, rack: string): number {
+  return scoreRack(word, rack, WWF_STYLE_SCORES);
 }
 
 // Handle wildcard pattern matching (? = any letter)

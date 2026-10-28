@@ -89,7 +89,7 @@ export default function AboutPage() {
               <li>
                 <strong>Character Frequency Vector Indexing:</strong> Our solver algorithm indexes dictionary
                 entries by letter distribution signatures. Comparing word signatures enables near-instantaneous
-                pruning and match detection across more than 170,000 verified English words.
+                pruning and match detection across about 142,000 verified English words.
               </li>
               <li>
                 <strong>Zero Query Logging:</strong> Because search computation never leaves your device, your
@@ -107,24 +107,23 @@ export default function AboutPage() {
             </p>
             <div className="mt-4 grid gap-6 sm:grid-cols-2">
               <div className="rounded border border-[#d9e5ec] bg-[#f8fbfa] p-5">
-                <h3 className="text-lg font-bold text-[#061a38]">Common Dictionary (~40,000 words)</h3>
+                <h3 className="text-lg font-bold text-[#061a38]">Common Dictionary (~39k words)</h3>
                 <p className="mt-2 text-sm leading-relaxed text-[#52657d]">
                   Optimized for everyday word puzzle games, family Scrabble matches, and quick anagram puzzles.
                   Filters out obscure archaic variants to provide clean, immediately recognizable answers.
                 </p>
               </div>
               <div className="rounded border border-[#d9e5ec] bg-[#f8fbfa] p-5">
-                <h3 className="text-lg font-bold text-[#061a38]">Extended Dictionary (~178,000 words)</h3>
+                <h3 className="text-lg font-bold text-[#061a38]">Extended Dictionary (~142k words)</h3>
                 <p className="mt-2 text-sm leading-relaxed text-[#52657d]">
-                  Designed for competitive tournament players, cryptic crossword enthusiasts, and deep anagram
-                  explorations. Includes specialized scientific terms, inflections, and historical spellings.
+                  A wider open English list for cryptic crossword enthusiasts and deep anagram explorations.
+                  Includes specialized scientific terms, inflections, and historical spellings.
                 </p>
               </div>
             </div>
             <p className="mt-4 text-sm text-[#52657d]">
-              Word lists are compiled from trusted open-source linguistic corpora, primarily SCOWL (Spell Checking
-              Oriented Word Lists). Point values reflect standard English letter tile distributions (e.g., Q=10,
-              Z=10, J=8, X=8) to help players calculate base rack potential at a glance.
+              Word lists are based on public English sources (e.g. SCOWL/ESDB-style lists), not licensed Scrabble tournament lists.
+              Points follow common Scrabble letter values for sorting. This is not an official Scrabble® dictionary or tournament word list.
             </p>
           </section>
 

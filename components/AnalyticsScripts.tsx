@@ -4,6 +4,38 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 
 const CONSENT_KEY = 'anagram-analytics-consent';
 const MEASUREMENT_ID = 'G-5G76PLCMD6';
+const ADSENSE_CLIENT = 'ca-pub-1548791648803369';
+
+function injectMeasurement() {
+  const win = window as unknown as {
+    dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
+  };
+  win.dataLayer = win.dataLayer || [];
+  if (typeof win.gtag !== 'function') {
+    win.gtag = (...args: unknown[]) => {
+      win.dataLayer?.push(args);
+    };
+    win.gtag('js', new Date());
+    win.gtag('config', MEASUREMENT_ID, { anonymize_ip: true });
+  }
+  if (!document.getElementById('ga-loader')) {
+    const ga = document.createElement('script');
+    ga.id = 'ga-loader';
+    ga.async = true;
+    ga.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;
+    document.head.appendChild(ga);
+  }
+  if (!document.getElementById('adsense-loader')) {
+    const ads = document.createElement('script');
+    ads.id = 'adsense-loader';
+    ads.async = true;
+    ads.crossOrigin = 'anonymous';
+    ads.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
+    ads.addEventListener('load', () => window.dispatchEvent(new Event('ads-ready')));
+    document.head.appendChild(ads);
+  }
+}
 
 type Consent = 'accepted' | 'declined' | 'unknown';
 
@@ -37,11 +69,32 @@ export default function AnalyticsScripts() {
   const [showChoices, setShowChoices] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const isDeclined = consent === 'declined';
-      // Standard Google Analytics opt-out flag for GDPR compliance
-      (window as unknown as Record<string, boolean>)[`ga-disable-${MEASUREMENT_ID}`] = isDeclined;
+    if (typeof window === 'undefined' || consent === null) return;
+    (window as unknown as Record<string, boolean>)[`ga-disable-${MEASUREMENT_ID}`] = consent !== 'accepted';
+    if (consent !== 'accepted') return;
+
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
+      injectMeasurement();
+    };
+    window.addEventListener('pointerdown', start, { once: true });
+    window.addEventListener('keydown', start, { once: true });
+    if (typeof window.requestIdleCallback === 'function') {
+      const idleId = window.requestIdleCallback(start, { timeout: 2500 });
+      return () => {
+        window.cancelIdleCallback(idleId);
+        window.removeEventListener('pointerdown', start);
+        window.removeEventListener('keydown', start);
+      };
     }
+    const timeoutId = window.setTimeout(start, 800);
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.removeEventListener('pointerdown', start);
+      window.removeEventListener('keydown', start);
+    };
   }, [consent]);
 
   const saveChoice = (choice: Exclude<Consent, 'unknown'>) => {

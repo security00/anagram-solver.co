@@ -1,5 +1,6 @@
 import {
   calculateRackScore,
+  calculateWwfStyleRackScore,
   createWordFromLettersMatcher,
   findAnagrams,
   findWithWildcards,
@@ -12,7 +13,7 @@ import {
   type PhraseWordCount,
 } from './anagramSolver';
 
-export type WordSort = 'length' | 'alphabetical' | 'score';
+export type WordSort = 'length' | 'alphabetical' | 'score' | 'wwf';
 export type WordSearchOperation = 'anagrams' | 'pattern' | 'scrabble' | 'words';
 
 export type WordSearchRequest = {
@@ -95,18 +96,14 @@ export function runWordSearch(
       (!suffix || word.endsWith(suffix))
   );
 
+  const rackScore =
+    request.sortBy === 'wwf' ? calculateWwfStyleRackScore : calculateRackScore;
   const sorted =
-    request.operation === 'scrabble' && request.sortBy === 'score'
+    request.operation === 'scrabble' && (request.sortBy === 'score' || request.sortBy === 'wwf')
       ? [...words].sort(
           (a, b) =>
-            calculateRackScore(
-              getRackPlacement(b, prefix, suffix) ?? b,
-              request.input
-            ) -
-              calculateRackScore(
-                getRackPlacement(a, prefix, suffix) ?? a,
-                request.input
-              ) ||
+            rackScore(getRackPlacement(b, prefix, suffix) ?? b, request.input) -
+              rackScore(getRackPlacement(a, prefix, suffix) ?? a, request.input) ||
             a.localeCompare(b)
         )
       : sortResults(words, request.sortBy);

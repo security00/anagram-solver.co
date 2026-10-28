@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import InnerPageShell, { InnerContent } from '@/components/InnerPageShell';
+import ToolCrossPromo from '@/components/ToolCrossPromo';
 import { getCanonicalUrl } from '@/lib/siteUrl';
 
 export const dynamic = 'force-static';
@@ -327,6 +328,7 @@ export default function AnagramTipsPage() {
               </Link>
             </div>
           </section>
+          <ToolCrossPromo hint="Unscramble on the tools these tips point to:" />
         </article>
       </InnerContent>
     </InnerPageShell>
