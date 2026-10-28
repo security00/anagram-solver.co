@@ -146,8 +146,9 @@ export default function PrivacyPage() {
           <p>
             We use Google Analytics 4 to gather aggregated, anonymized traffic insights, such as page
             popularity, device categories, and general session duration. IP anonymization is enabled by
-            default. If you decline analytics or enable GPC, an automated opt-out disable flag is engaged
-            locally in your browser, suppressing measurement and event collection.
+            default. Google Analytics and AdSense scripts load only after you choose Allow, or after a later
+            idle moment once that choice is saved. If you decline, or if your browser sends Global Privacy
+            Control (GPC) or Do Not Track (DNT), those scripts are not requested.
           </p>
 
           <h3>Google AdSense and Advertising Cookies</h3>

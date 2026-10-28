@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import InnerPageShell, { InnerContent } from '@/components/InnerPageShell';
+import ToolCrossPromo from '@/components/ToolCrossPromo';
 import { getCanonicalUrl } from '@/lib/siteUrl';
 
 export const dynamic = 'force-static';
@@ -370,6 +371,7 @@ export default function ScrabbleStrategyPage() {
               </Link>
             </div>
           </section>
+          <ToolCrossPromo hint="Practice a rack on the solvers:" />
         </article>
       </InnerContent>
     </InnerPageShell>

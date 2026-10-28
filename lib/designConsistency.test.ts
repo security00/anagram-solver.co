@@ -20,6 +20,9 @@ const innerPages = [
   'app/tools/three-word-anagram-solver/page.tsx',
   'app/tools/two-word-anagram-solver/page.tsx',
   'app/tools/word-finder/page.tsx',
+  'app/tools/words-with-friends-finder/page.tsx',
+  'app/tools/jumble-solver/page.tsx',
+  'app/not-found.tsx',
 ];
 
 const innerTools = [
@@ -27,6 +30,9 @@ const innerTools = [
   'components/MultipleWordsAnagramTool.tsx',
   'components/ScrabbleSolverTool.tsx',
   'components/WordFinderTool.tsx',
+  'components/WordsWithFriendsTool.tsx',
+  'components/JumbleSolverTool.tsx',
+  'components/SolverResultStates.tsx',
 ];
 
 const legacyVisualTokens =

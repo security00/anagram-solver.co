@@ -22,6 +22,13 @@ describe('findAnagrams', () => {
 
     expect(findAnagrams('The eyes!', dictionary)).toEqual(['theysee', 'theeyes']);
   });
+
+  it('uses ? and * as blanks that must fill an exact-length word', () => {
+    const dictionary = new Set(['cat', 'cot', 'cut', 'coat', 'at']);
+
+    expect(findAnagrams('c?t', dictionary)).toEqual(['cat', 'cot', 'cut']);
+    expect(findAnagrams('c*t', dictionary)).toEqual(['cat', 'cot', 'cut']);
+  });
 });
 
 describe('findWithWildcards', () => {

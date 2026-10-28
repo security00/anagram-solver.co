@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import RecentSearches from '@/components/RecentSearches';
+import { EmptyFilterResults, ResultFilterFields } from '@/components/SolverResultStates';
 import { calculateScore } from '@/lib/anagramSolver';
+import { applyResultFilters, emptyResultFilters, type ResultFilters } from '@/lib/resultFilters';
 import { readRecentSearches, rememberSearch } from '@/lib/searchHistory';
 import { getWordHint, getWordLookupHref } from '@/lib/wordHints';
 import { runWordSolverQuery } from '@/lib/solverClient';
@@ -26,9 +28,17 @@ export default function WordFinderTool() {
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [filters, setFilters] = useState<ResultFilters>(emptyResultFilters);
 
   useEffect(() => {
     setRecentSearches(readRecentSearches('word-finder'));
+    const params = new URLSearchParams(window.location.search);
+    const min = Number(params.get('min'));
+    const max = Number(params.get('max'));
+    const query = (params.get('q') || '').trim();
+    if (Number.isFinite(min) && min >= 2 && min <= 15) setMinLength(min);
+    if (Number.isFinite(max) && max >= 2 && max <= 20) setMaxLength(max);
+    if (query) setLetters(query);
   }, []);
 
   const handleSolve = async () => {
@@ -54,6 +64,7 @@ export default function WordFinderTool() {
       setResults(outcome.words);
       setTotal(outcome.total);
       setVisibleCount(PAGE_SIZE);
+      setFilters(emptyResultFilters);
     } catch (searchError) {
       setResults([]);
       setTotal(0);
@@ -63,7 +74,8 @@ export default function WordFinderTool() {
     }
   };
 
-  const visibleResults = results.slice(0, visibleCount);
+  const filtered = applyResultFilters(results, filters);
+  const visibleResults = filtered.slice(0, visibleCount);
 
   return (
     <div className="tool-shell">
@@ -133,7 +145,9 @@ export default function WordFinderTool() {
                 </button>
               )}
             </div>
-            <span className="tool-help tool-help-on-dark">Use ? for exactly one unknown letter.</span>
+            <span className="tool-help tool-help-on-dark">
+              Pattern: ? is one unknown letter. Letters mode also accepts ? or * as a blank tile.
+            </span>
           </label>
         </div>
       </div>
@@ -177,13 +191,23 @@ export default function WordFinderTool() {
           <div aria-live="polite">
             {error && <p className="tool-status tool-status-error">{error}</p>}
             {!error && searched && !loading && total === 0 && (
-              <p className="tool-status">No matching words found.</p>
+              <div className="empty-results">
+                <h2>No words found for that rack</h2>
+                <p>Try Extended dictionary, switch Exact ↔ Words from letters, or check for typos.</p>
+              </div>
             )}
             {total > 0 && (
               <div className="mt-6">
                 <h3 className="tool-results-heading">
-                  Found {total} word{total === 1 ? '' : 's'}{total > results.length ? ` — showing the first ${results.length}` : ''}
+                  Found {filtered.length} word{filtered.length === 1 ? '' : 's'}
+                  {filtered.length !== total ? ` of ${total}` : ''}
+                  {total > results.length ? ` — showing the first ${results.length}` : ''}
                 </h3>
+                <ResultFilterFields filters={filters} onChange={setFilters} />
+                {filtered.length === 0 ? (
+                  <EmptyFilterResults onClear={() => setFilters(emptyResultFilters)} />
+                ) : (
+                <>
                 <div className="grid max-h-96 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
                   {visibleResults.map((word) => {
                     const hint = getWordHint(word);
@@ -207,10 +231,12 @@ export default function WordFinderTool() {
                     );
                   })}
                 </div>
-                {visibleCount < results.length && (
+                {visibleCount < filtered.length && (
                   <button type="button" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)} className="tool-secondary-button mt-4 w-full">
                     Show more
                   </button>
+                )}
+                </>
                 )}
               </div>
             )}

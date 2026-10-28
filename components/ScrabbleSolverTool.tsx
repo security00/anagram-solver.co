@@ -13,6 +13,7 @@ export default function ScrabbleSolverTool() {
   const [tiles, setTiles] = useState('');
   const [prefix, setPrefix] = useState('');
   const [suffix, setSuffix] = useState('');
+  const [contains, setContains] = useState('');
   const [minLength, setMinLength] = useState(2);
   const [dictionaryType, setDictionaryType] = useState<DictionaryType>('common');
   const [results, setResults] = useState<string[]>([]);
@@ -55,6 +56,8 @@ export default function ScrabbleSolverTool() {
     }
   };
 
+  const needle = contains.toLowerCase().replace(/[^a-z]/g, '');
+  const filtered = needle ? results.filter((word) => word.includes(needle)) : results;
   const scoreWord = (word: string) => tiles.trim()
     ? calculateRackScore(getRackPlacement(word, prefix, suffix) ?? word, tiles)
     : calculateScore(word);
@@ -116,6 +119,10 @@ export default function ScrabbleSolverTool() {
               <input value={suffix} onChange={(event) => setSuffix(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && handleSolve()} placeholder="optional" className="tool-input" maxLength={8} />
             </label>
             <label className="tool-label">
+              Contains
+              <input value={contains} onChange={(event) => setContains(event.target.value)} placeholder="optional" className="tool-input" maxLength={12} />
+            </label>
+            <label className="tool-label">
               Minimum length
               <select value={minLength} onChange={(event) => setMinLength(Number(event.target.value))} className="tool-select">
                 {[2, 3, 4, 5, 6, 7].map((length) => <option key={length} value={length}>{length} letters</option>)}
@@ -123,6 +130,9 @@ export default function ScrabbleSolverTool() {
             </label>
           </div>
 
+          <p className="text-sm text-[#52657d]">
+            Prefix keeps words that start with those letters. Suffix keeps words that end with them. Contains filters the list.
+          </p>
           <button
             onClick={handleSolve}
             disabled={!tiles.trim() || loading}
@@ -132,28 +142,41 @@ export default function ScrabbleSolverTool() {
           </button>
 
           <p className="tool-status tool-status-warning">
-            This uses an open English spelling list and Scrabble-style letter values. It is not an official tournament word authority, and scores exclude board multipliers.
+            Points follow common Scrabble letter values for sorting. This is not an official Scrabble® dictionary or tournament word list.
           </p>
 
           <div aria-live="polite">
             {error && <p className="tool-status tool-status-error">{error}</p>}
             {!error && searched && !loading && total === 0 && (
-              <p className="tool-status">No matching rack words found.</p>
+              <div className="empty-results">
+                <h2>No words found for that rack</h2>
+                <p>Try Extended dictionary, switch Exact ↔ Words from letters, or check for typos.</p>
+              </div>
             )}
-            {total > 0 && (
+            {!error && searched && !loading && total > 0 && filtered.length === 0 && (
+              <div className="empty-results">
+                <h2>No words match these filters</h2>
+                <p>Clear Starts / Ends / Contains or the length filter to see all matches again.</p>
+                <div className="empty-results-actions">
+                  <button type="button" className="primary" onClick={() => setContains('')}>Clear filters</button>
+                  <button type="button" onClick={() => setContains('')}>Show all results</button>
+                </div>
+              </div>
+            )}
+            {filtered.length > 0 && (
               <div className="mt-6">
                 <h3 className="tool-results-heading">
-                  Found {total} word{total === 1 ? '' : 's'}{total > results.length ? ` — showing the top ${results.length}` : ''}
+                  Found {needle ? filtered.length : total} word{(needle ? filtered.length : total) === 1 ? '' : 's'}{!needle && total > results.length ? ` — showing the top ${results.length}` : ''}
                 </h3>
                 <div className="grid max-h-96 grid-cols-1 gap-3 overflow-y-auto sm:grid-cols-2 md:grid-cols-3">
-                  {results.slice(0, visibleCount).map((word) => (
+                  {filtered.slice(0, visibleCount).map((word) => (
                     <div key={word} className="tool-result-card text-center">
                       <span className="tool-result-word text-lg">{word.toUpperCase()}</span>
                       <div className="tool-result-meta mt-1">{word.length} letters · {scoreWord(word)} rack points</div>
                     </div>
                   ))}
                 </div>
-                {visibleCount < results.length && (
+                {visibleCount < filtered.length && (
                   <button type="button" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)} className="tool-secondary-button mt-4 w-full">
                     Show more
                   </button>

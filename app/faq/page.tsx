@@ -45,19 +45,24 @@ const faqCategories = [
     category: '2. Dictionaries & Lexicon Standards',
     items: [
       {
-        question: 'What is the difference between Common and Extended English dictionaries?',
+        question: 'How big is the dictionary?',
         answer:
-          'The Common Dictionary contains roughly 40,000 everyday English words, ideal for standard board games and family puzzle solving without obscure distractions. The Extended Dictionary includes over 178,000 words, featuring specialized terminology, archaic spellings, and tournament-level vocabulary.',
+          'Common mode uses about 39,000 everyday words for speed. Extended mode uses about 142,000 words. Counts can shift slightly when we refresh the lists.',
+      },
+      {
+        question: 'Are these official Scrabble words?',
+        answer:
+          'No. We show Scrabble-style letter points so you can sort by score, but our word lists are not an official Scrabble® dictionary or tournament word list. Always check your game’s rulebook or official list for tournament play.',
       },
       {
         question: 'What sources are used to build the word lists?',
         answer:
-          'Our lexicons are compiled from trusted public-domain linguistic databases, primarily SCOWL (Spell Checking Oriented Word Lists) and established open English corpora. They are regularly updated to ensure high accuracy while removing offensive slurs.',
+          'Word lists are based on public English sources (e.g. SCOWL/ESDB-style lists), not licensed Scrabble tournament lists.',
       },
       {
-        question: 'Why might a legitimate English word occasionally be missing?',
+        question: 'Why did a word I know not appear?',
         answer:
-          'English is vast and evolving. Brand names, hyphenated terms, and newly coined internet slang stay out of the default English lists. Personal names are off by default; turn on Include common names in the multi-word solver when you want given names and surnames. If you notice a standard dictionary word missing, feel free to notify us via our Contact page.',
+          'Try Extended dictionary, switch between Exact anagrams and Words from letters, or open Word Finder / Rack Word Finder for blanks (? / *) and patterns. Some proper names and slang are only in the name or multi-word tools.',
       },
     ],
   },
@@ -77,7 +82,7 @@ const faqCategories = [
       {
         question: 'How do wildcards and blank tiles work in searches?',
         answer:
-          'In our Rack Word Finder, you can enter ? or * for up to 2 blank tiles. The solver tries all 26 English letters in those positions to find winning words, scoring blank tiles as 0 points in accordance with official tournament rules.',
+          'On the homepage Words-from-letters mode, Rack Word Finder, and Words With Friends finder, enter ? or * for a blank. Blanks score 0 face points. Points follow common Scrabble letter values for sorting. This is not an official Scrabble® dictionary or tournament word list.',
       },
     ],
   },
@@ -85,9 +90,14 @@ const faqCategories = [
     category: '4. Privacy, Speed & Technical Architecture',
     items: [
       {
+        question: 'Is my search sent to a server?',
+        answer:
+          'Solving runs in your browser with a Web Worker. Ads and analytics load only under your cookie choice where applicable.',
+      },
+      {
         question: 'Are my letters or puzzle clues uploaded to any server?',
         answer:
-          'Never. Our solvers execute 100% inside your local browser using client-side Web Workers. Your letters, secret puzzle clues, and results are never transmitted to, inspected by, or stored on any remote server.',
+          'Solving runs in your browser with a Web Worker. Your letters are not uploaded for the solve itself. Ads and analytics load only under your cookie choice where applicable.',
       },
       {
         question: 'Does the website work offline or on mobile devices?',

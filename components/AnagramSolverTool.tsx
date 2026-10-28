@@ -9,16 +9,20 @@ import {
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import RecentSearches from '@/components/RecentSearches';
+import { EmptyFilterResults, EmptyRackResults, ResultFilterFields } from '@/components/SolverResultStates';
 import { calculateScore } from '@/lib/anagramSolver';
 import { getHomeDailyChallenge } from '@/lib/dailyChallenge';
+import { dictionaryStatusLabel, prefetchWordList } from '@/lib/dictionaryProgress';
+import { applyResultFilters, emptyResultFilters, filtersActive, groupWordsByLength, type ResultFilters } from '@/lib/resultFilters';
 import { readRecentSearches, rememberSearch } from '@/lib/searchHistory';
 import { getWordHint, getWordLookupHref } from '@/lib/wordHints';
 import { runWordSolverQuery } from '@/lib/solverClient';
+import { trackSolverFeedback } from '@/lib/trackEvent';
 import type { DictionaryType } from '@/lib/dictionaryData';
 import type { WordSort } from '@/lib/solverEngine';
 
 const RESULT_LIMIT = 500;
-const PAGE_SIZE = 100;
+const PAGE_SIZE = 40;
 
 type SolveMode = 'exact' | 'words';
 
@@ -35,19 +39,33 @@ function parseMode(value: string | null): SolveMode {
   return value === 'words' || value === 'from-letters' ? 'words' : 'exact';
 }
 
+function syncQuery(word: string, mode: SolveMode) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('q', word.trim());
+  url.searchParams.set('mode', mode);
+  const next = `${url.pathname}?${url.searchParams.toString()}`;
+  const current = `${window.location.pathname}${window.location.search}`;
+  if (next !== current) window.history.replaceState(null, '', next);
+}
+
 export default function AnagramSolverTool() {
-  const [input, setInput] = useState('LISTEN');
+  const [input, setInput] = useState('');
   const [solveMode, setSolveMode] = useState<SolveMode>('exact');
   const [results, setResults] = useState<string[]>([]);
   const [total, setTotal] = useState(0);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [phase, setPhase] = useState<'loading' | 'searching'>('searching');
+  const [loadedBytes, setLoadedBytes] = useState(0);
+  const [activeDict, setActiveDict] = useState<DictionaryType>('common');
   const [error, setError] = useState('');
   const [sortBy, setSortBy] = useState<WordSort>('length');
   const [dictionaryType, setDictionaryType] = useState<DictionaryType>('common');
+  const [filters, setFilters] = useState<ResultFilters>(emptyResultFilters);
+  const [groupLimits, setGroupLimits] = useState<Record<number, number>>({});
   const [copiedWord, setCopiedWord] = useState<string | null>(null);
   const [copiedShare, setCopiedShare] = useState(false);
+  const [canShare, setCanShare] = useState(false);
   const [feedbackVote, setFeedbackVote] = useState<'yes' | 'no' | null>(null);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [dailyPrompt, setDailyPrompt] = useState('');
@@ -55,6 +73,10 @@ export default function AnagramSolverTool() {
   useEffect(() => {
     setRecentSearches(readRecentSearches('home'));
     setDailyPrompt(getHomeDailyChallenge().prompt);
+    const media = window.matchMedia('(max-width: 767px)');
+    const updateShare = () => setCanShare(media.matches && typeof navigator.share === 'function');
+    updateShare();
+    media.addEventListener('change', updateShare);
 
     const params = new URLSearchParams(window.location.search);
     const nextMode = parseMode(params.get('mode'));
@@ -64,8 +86,13 @@ export default function AnagramSolverTool() {
       setInput(query);
       void handleSolveWithWord(query, nextMode);
     }
+    return () => media.removeEventListener('change', updateShare);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (dictionaryType === 'full') prefetchWordList('full');
+  }, [dictionaryType]);
 
   const handleCopyWord = (word: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -77,28 +104,47 @@ export default function AnagramSolverTool() {
     }
   };
 
-  const handleSolveWithWord = async (wordToSolve: string, mode = solveMode) => {
+  const handleSolveWithWord = async (
+    wordToSolve: string,
+    mode = solveMode,
+    dict = dictionaryType,
+  ) => {
     if (!wordToSolve.trim()) return;
 
     setLoading(true);
+    setPhase(dict === 'full' ? 'loading' : 'searching');
+    setLoadedBytes(0);
+    setActiveDict(dict);
     setError('');
     setSearched(true);
+    setFeedbackVote(null);
+    setFilters(emptyResultFilters);
+    setGroupLimits({});
     setRecentSearches(rememberSearch('home', wordToSolve));
     try {
-      const outcome = await runWordSolverQuery({
-        dictionaryType,
-        kind: 'words',
-        request: {
-          input: wordToSolve,
-          limit: RESULT_LIMIT,
-          minLength: mode === 'words' ? 2 : undefined,
-          operation: mode === 'words' ? 'words' : 'anagrams',
-          sortBy,
+      const outcome = await runWordSolverQuery(
+        {
+          dictionaryType: dict,
+          kind: 'words',
+          request: {
+            input: wordToSolve,
+            limit: RESULT_LIMIT,
+            minLength: mode === 'words' ? 2 : undefined,
+            operation: mode === 'words' ? 'words' : 'anagrams',
+            sortBy,
+          },
         },
-      });
+        (progress) => {
+          setPhase(progress.phase);
+          setLoadedBytes(progress.loadedBytes);
+          if (progress.dictionaryType === 'common' || progress.dictionaryType === 'full') {
+            setActiveDict(progress.dictionaryType);
+          }
+        },
+      );
       setResults(outcome.words);
       setTotal(outcome.total);
-      setVisibleCount(PAGE_SIZE);
+      syncQuery(wordToSolve, mode);
     } catch (searchError) {
       setResults([]);
       setTotal(0);
@@ -125,13 +171,37 @@ export default function AnagramSolverTool() {
     setTimeout(() => setCopiedShare(false), 1600);
   };
 
-  const visibleResults = results.slice(0, visibleCount);
+  const shareWord = async (word: string) => {
+    if (!navigator.share) return;
+    const url = `${window.location.origin}/?q=${encodeURIComponent(input.trim())}&mode=${solveMode}`;
+    try {
+      await navigator.share({ text: word.toUpperCase(), title: word.toUpperCase(), url });
+    } catch {
+      // The share sheet was dismissed.
+    }
+  };
+
+  const vote = (choice: 'yes' | 'no') => {
+    setFeedbackVote(choice);
+    trackSolverFeedback(choice, {
+      dictionary: dictionaryType,
+      mode: solveMode,
+      tool: 'home',
+    });
+  };
+
+  const filtered = applyResultFilters(results, filters);
+  const grouped = groupWordsByLength(filtered, sortBy);
+  const lettersOnly = input.replace(/[^a-zA-Z?*]/g, '');
+  const hasBlank = /[?*]/.test(input);
+  const longInput = lettersOnly.length >= 12 || /\s/.test(input.trim());
+  const statusLabel = dictionaryStatusLabel(phase, activeDict, loadedBytes);
   const resultLabel =
     solveMode === 'exact'
-      ? total === 1
+      ? filtered.length === 1
         ? 'exact anagram'
         : 'exact anagrams'
-      : total === 1
+      : filtered.length === 1
         ? 'word from these letters'
         : 'words from these letters';
 
@@ -205,6 +275,7 @@ export default function AnagramSolverTool() {
                     setTotal(0);
                     setSearched(false);
                     setError('');
+                    setFilters(emptyResultFilters);
                   }}
                   className="tool-clear-button"
                   aria-label="Clear input"
@@ -220,7 +291,7 @@ export default function AnagramSolverTool() {
             disabled={!input.trim() || loading}
             className="group flex h-[60px] w-full items-center justify-center gap-4 bg-[#09c4d8] px-5 text-lg font-extrabold text-[#061a38] transition-colors hover:bg-[#41d7e5] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? 'Solving…' : solveMode === 'exact' ? 'Solve' : 'Unscramble'}
+            {loading ? (phase === 'loading' ? 'Loading…' : 'Searching…') : solveMode === 'exact' ? 'Solve' : 'Unscramble'}
             {!loading && <ArrowRightIcon className="h-6 w-6 transition-transform group-hover:translate-x-1" aria-hidden="true" />}
           </button>
         </div>
@@ -235,8 +306,8 @@ export default function AnagramSolverTool() {
                 onChange={(event) => setDictionaryType(event.target.value as DictionaryType)}
                 className="mt-1 w-full cursor-pointer bg-transparent text-sm font-semibold text-[#061a38] sm:text-base"
               >
-                <option value="common">Common English (faster)</option>
-                <option value="full">Extended English</option>
+                <option value="common">Common English (~39k)</option>
+                <option value="full">Extended English (~142k)</option>
               </select>
             </span>
           </label>
@@ -260,8 +331,8 @@ export default function AnagramSolverTool() {
           <p id="anagram-rule" className="flex min-h-24 items-center gap-3 px-5 py-4 text-sm leading-6 text-[#52657d] lg:px-7">
             <CheckCircleIcon className="h-6 w-6 shrink-0 text-[#00aebf]" aria-hidden="true" />
             {solveMode === 'exact'
-              ? 'Exact anagrams use every letter once. Spaces and punctuation do not count.'
-              : 'Words-from-letters mode finds every shorter valid word in the same rack, including 2-letter hooks.'}
+              ? 'Exact anagrams use every letter once. ? or * is a blank. Spaces and punctuation do not count.'
+              : 'Words from letters finds shorter words in the same rack. ? or * is a blank tile.'}
           </p>
         </div>
 
@@ -269,11 +340,20 @@ export default function AnagramSolverTool() {
           {error && <p className="border border-red-200 bg-red-50 p-4 text-red-800">{error}</p>}
 
           {!error && searched && !loading && total === 0 && (
-            <p className="border border-[#d9e5ec] bg-[#f7fafb] p-4 text-[#334a66]">
-              {solveMode === 'exact'
-                ? 'No exact anagrams found. Switch to Words from letters, try the extended dictionary, or open Word Finder.'
-                : 'No words found. Try the extended dictionary or add more letters.'}
-            </p>
+            <EmptyRackResults
+              hasBlank={hasBlank}
+              longInput={longInput}
+              mode={solveMode}
+              query={input}
+              onExtended={() => {
+                setDictionaryType('full');
+                void handleSolveWithWord(input, solveMode, 'full');
+              }}
+              onWordsMode={() => {
+                setSolveMode('words');
+                void handleSolveWithWord(input, 'words');
+              }}
+            />
           )}
 
           {!searched && (
@@ -328,64 +408,97 @@ export default function AnagramSolverTool() {
             </div>
           )}
 
-          {loading && <p className="py-3 text-sm font-medium text-[#52657d]">Searching the local dictionary…</p>}
+          {loading && <p className="py-3 text-sm font-medium text-[#52657d]">{statusLabel}</p>}
 
           {!error && !loading && total > 0 && (
             <div>
               <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
                 <h2 className="text-lg font-bold text-[#061a38]">
-                  {total} {resultLabel}
+                  {filtered.length} {resultLabel}
+                  {filtersActive(filters) ? ` of ${total}` : ''}
                 </h2>
                 <div className="flex items-center gap-3">
                   {total > results.length && <p className="text-sm text-[#687b91]">Showing the first {results.length}</p>}
-                  <button type="button" onClick={handleShare} className="text-xs font-bold text-[#007f8d] underline">
-                    {copiedShare ? 'Link copied' : 'Copy share link'}
-                  </button>
+                  {!canShare && (
+                    <button type="button" onClick={handleShare} className="text-xs font-bold text-[#007f8d] underline">
+                      {copiedShare ? 'Link copied' : 'Copy share link'}
+                    </button>
+                  )}
                 </div>
               </div>
-              <div className="grid max-h-96 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3 lg:grid-cols-5">
-                {visibleResults.map((word) => {
-                  const isCopied = copiedWord === word;
-                  const hint = getWordHint(word);
-                  return (
-                    <div key={word} className="border border-[#b9d9e3] bg-white px-3 py-3 text-center">
-                      <button
-                        type="button"
-                        onClick={() => handleCopyWord(word)}
-                        className="w-full cursor-pointer"
-                        title={hint ?? 'Click to copy word'}
-                      >
-                        <span className="font-mono font-bold tracking-[0.12em] text-[#061a38]">
-                          {word.toUpperCase()}
-                        </span>
-                        <span className="ml-2 text-xs font-semibold text-[#007f8d]">
-                          {isCopied ? '✓ Copied' : `${calculateScore(word)} pts`}
-                        </span>
-                      </button>
-                      {hint ? (
-                        <p className="mt-1 text-[11px] leading-4 text-[#687b91]">{hint}</p>
-                      ) : (
-                        <a
-                          href={getWordLookupHref(word)}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="word-hint-link"
-                        >
-                          Definition
-                        </a>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              {visibleCount < results.length && (
-                <button
-                  type="button"
-                  onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
-                  className="mt-4 w-full border border-[#8cced8] px-4 py-3 font-bold text-[#007f8d] hover:bg-[#effbfc]"
-                >
-                  Show more
-                </button>
+
+              <ResultFilterFields filters={filters} onChange={setFilters} />
+
+              {filtered.length === 0 ? (
+                <EmptyFilterResults onClear={() => setFilters(emptyResultFilters)} />
+              ) : (
+                <div>
+                  {grouped.map((group, index) => {
+                    const limit = groupLimits[group.length] ?? PAGE_SIZE;
+                    const visible = group.words.slice(0, limit);
+                    return (
+                      <details key={group.length} className="result-length-group" open={index === 0}>
+                        <summary>
+                          {group.length} letters ({group.words.length})
+                        </summary>
+                        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                          {visible.map((word) => {
+                            const isCopied = copiedWord === word;
+                            const hint = getWordHint(word);
+                            return (
+                              <div key={word} className="border border-[#b9d9e3] bg-white px-3 py-3 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyWord(word)}
+                                  className="w-full cursor-pointer"
+                                  title={hint ?? 'Scrabble-style letter points. Unofficial word list.'}
+                                >
+                                  <span className="font-mono font-bold tracking-[0.12em] text-[#061a38]">
+                                    {word.toUpperCase()}
+                                  </span>
+                                  <span className="ml-2 text-xs font-semibold text-[#007f8d]">
+                                    {isCopied ? '✓ Copied' : `${calculateScore(word)} pts`}
+                                  </span>
+                                </button>
+                                {hint ? (
+                                  <p className="mt-1 text-[11px] leading-4 text-[#687b91]">{hint}</p>
+                                ) : (
+                                  <a
+                                    href={getWordLookupHref(word)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="word-hint-link"
+                                  >
+                                    Definition
+                                  </a>
+                                )}
+                                {canShare && (
+                                  <button type="button" className="result-share-btn" onClick={() => void shareWord(word)}>
+                                    Share
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {limit < group.words.length && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setGroupLimits((current) => ({
+                                ...current,
+                                [group.length]: (current[group.length] ?? PAGE_SIZE) + PAGE_SIZE,
+                              }))
+                            }
+                            className="mt-4 w-full border border-[#8cced8] px-4 py-3 font-bold text-[#007f8d] hover:bg-[#effbfc]"
+                          >
+                            Show more
+                          </button>
+                        )}
+                      </details>
+                    );
+                  })}
+                </div>
               )}
 
               <div className="tool-feedback-box">
@@ -396,20 +509,36 @@ export default function AnagramSolverTool() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => setFeedbackVote('yes')}
+                    onClick={() => vote('yes')}
                     className={`tool-feedback-action-btn ${feedbackVote === 'yes' ? 'active' : ''}`}
                   >
                     Yes
                   </button>
                   <button
                     type="button"
-                    onClick={() => setFeedbackVote('no')}
+                    onClick={() => vote('no')}
                     className={`tool-feedback-action-btn ${feedbackVote === 'no' ? 'active' : ''}`}
                   >
                     No
                   </button>
                 </div>
               </div>
+              {feedbackVote === 'no' && (
+                <div className="feedback-nudge">
+                  <p>Sorry that didn’t help. Want a wider list or a pattern search?</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDictionaryType('full');
+                      void handleSolveWithWord(input, solveMode, 'full');
+                    }}
+                  >
+                    Try Extended
+                  </button>
+                  <Link href="/tools/word-finder">Word Finder</Link>
+                  <Link href="/contact">Contact</Link>
+                </div>
+              )}
             </div>
           )}
 
@@ -426,23 +555,24 @@ export default function AnagramSolverTool() {
           )}
 
           <div className="tool-trust-bar">
-            <div className="tool-trust-items">
-              <span className="tool-trust-item">
-                <span className="tool-trust-dot" />
-                <span>100% In-Browser Computation</span>
-              </span>
-              <span className="tool-trust-item">
-                <span className="tool-trust-dot" />
-                <span>Zero Data Uploaded (Private)</span>
-              </span>
-              <span className="tool-trust-item">
-                <span className="tool-trust-dot" />
-                <span>Official Scrabble &amp; Tournament Points</span>
-              </span>
+            <div>
+              <div className="tool-trust-items">
+                <span className="tool-trust-item">
+                  <span className="tool-trust-dot" />
+                  <span>100% In-Browser Computation</span>
+                </span>
+                <span className="tool-trust-item">
+                  <span className="tool-trust-dot" />
+                  <span>Zero Data Uploaded (Private)</span>
+                </span>
+                <span className="tool-trust-item">
+                  <span className="tool-trust-dot" />
+                  <span>Scrabble-style letter points · Unofficial word list</span>
+                </span>
+              </div>
+              <p className="tool-trust-sub">Common ~39k · Extended ~142k · Runs in your browser</p>
             </div>
-            <span className="tool-trust-badge">
-              Updated October 2026
-            </span>
+            <span className="tool-trust-badge">Updated October 2026</span>
           </div>
         </div>
       </form>

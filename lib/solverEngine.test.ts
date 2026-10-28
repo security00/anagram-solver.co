@@ -47,6 +47,21 @@ describe('runWordSearch', () => {
     expect(outcome.truncated).toBe(true);
   });
 
+  it('sorts Words With Friends-style face values apart from Scrabble-style values', () => {
+    const request = {
+      input: 'cabhay',
+      limit: 10,
+      minLength: 3,
+      operation: 'words' as const,
+    };
+    expect(
+      runWordSearch(new Set(['cab', 'hay']), { ...request, sortBy: 'wwf' }).words[0],
+    ).toBe('cab');
+    expect(
+      runWordSearch(new Set(['cab', 'hay']), { ...request, sortBy: 'score' }).words[0],
+    ).toBe('hay');
+  });
+
   it('sorts blank-tile Scrabble results by their actual rack score', () => {
     const outcome = runWordSearch(new Set(['za', 'ba']), {
       input: '?a',

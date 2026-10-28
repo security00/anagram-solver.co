@@ -3,6 +3,7 @@
 import type { MultiWordSearchOutcome } from './anagramSolver';
 import type { WordSearchOutcome } from './solverEngine';
 import type {
+  SolverProgressMessage,
   SolverQuery,
   SolverQueryOutcome,
   SolverWorkerRequest,
@@ -10,6 +11,7 @@ import type {
 } from './solverProtocol';
 
 type PendingRequest = {
+  onProgress?: (message: SolverProgressMessage) => void;
   reject: (error: Error) => void;
   resolve: (value: SolverQueryOutcome) => void;
   timeout: ReturnType<typeof setTimeout>;
@@ -18,6 +20,12 @@ type PendingRequest = {
 const pendingRequests = new Map<number, PendingRequest>();
 let nextRequestId = 1;
 let solverWorker: Worker | null = null;
+
+function isProgress(
+  message: SolverWorkerResponse | SolverProgressMessage,
+): message is SolverProgressMessage {
+  return 'kind' in message && message.kind === 'progress';
+}
 
 function rejectAll(error: Error): void {
   for (const pending of pendingRequests.values()) {
@@ -44,8 +52,12 @@ function getWorker(): Worker {
     type: 'module',
   });
 
-  solverWorker.addEventListener('message', (event: MessageEvent<SolverWorkerResponse>) => {
+  solverWorker.addEventListener('message', (event: MessageEvent<SolverWorkerResponse | SolverProgressMessage>) => {
     const response = event.data;
+    if (isProgress(response)) {
+      pendingRequests.get(response.id)?.onProgress?.(response);
+      return;
+    }
     const pending = pendingRequests.get(response.id);
     if (!pending) return;
 
@@ -65,7 +77,10 @@ function getWorker(): Worker {
   return solverWorker;
 }
 
-export function runSolverQuery<T extends SolverQueryOutcome>(query: SolverQuery): Promise<T> {
+export function runSolverQuery<T extends SolverQueryOutcome>(
+  query: SolverQuery,
+  onProgress?: (message: SolverProgressMessage) => void,
+): Promise<T> {
   const worker = getWorker();
   const id = nextRequestId++;
 
@@ -74,9 +89,10 @@ export function runSolverQuery<T extends SolverQueryOutcome>(query: SolverQuery)
       pendingRequests.delete(id);
       resetWorker(new Error('The search took too long and was cancelled.'));
       reject(new Error('The search took too long and was cancelled.'));
-    }, 15_000);
+    }, 30_000);
 
     pendingRequests.set(id, {
+      onProgress,
       reject,
       resolve: resolve as (value: SolverQueryOutcome) => void,
       timeout,
@@ -87,8 +103,11 @@ export function runSolverQuery<T extends SolverQueryOutcome>(query: SolverQuery)
   });
 }
 
-export function runWordSolverQuery(query: Extract<SolverQuery, { kind: 'words' }>) {
-  return runSolverQuery<WordSearchOutcome>(query);
+export function runWordSolverQuery(
+  query: Extract<SolverQuery, { kind: 'words' }>,
+  onProgress?: (message: SolverProgressMessage) => void,
+) {
+  return runSolverQuery<WordSearchOutcome>(query, onProgress);
 }
 
 export function runMultiWordSolverQuery(query: Extract<SolverQuery, { kind: 'multi' }>) {

@@ -8,6 +8,8 @@ export default function Footer() {
     tools: [
       { name: 'Anagram Solver', href: '/' },
       { name: 'Rack Word Finder', href: '/tools/scrabble-solver' },
+      { name: 'Words With Friends Finder', href: '/tools/words-with-friends-finder' },
+      { name: 'Jumble Solver', href: '/tools/jumble-solver' },
       { name: 'Word Finder', href: '/tools/word-finder' },
       { name: 'Multiple Word Anagrams', href: '/tools/multiple-words' },
       { name: 'Two Word Anagram Solver', href: '/tools/two-word-anagram-solver' },
@@ -107,6 +109,9 @@ export default function Footer() {
         <div className="mt-14 border-t border-white/10 pt-8">
           <p className="text-xs leading-5 text-slate-400">
             &copy; {currentYear} Anagram Solver. Open-dictionary word tools for puzzles and learning.
+          </p>
+          <p className="mt-2 max-w-3xl text-xs leading-5 text-slate-400">
+            Word lists are based on public English sources (e.g. SCOWL/ESDB-style lists), not licensed Scrabble tournament lists.
           </p>
         </div>
       </div>
